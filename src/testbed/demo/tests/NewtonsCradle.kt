@@ -1,52 +1,55 @@
-package testbed.demo.tests;
+package testbed.demo.tests
 
-import library.dynamics.Body;
-import library.dynamics.World;
-import library.geometry.Circle;
-import library.joints.Joint;
-import library.joints.JointToPoint;
-import library.math.Vectors2D;
-import testbed.demo.TestBedWindow;
+import library.dynamics.Body
+import library.dynamics.World
+import library.geometry.Circle
+import library.joints.Joint
+import library.joints.JointToPoint
+import library.math.Vec2
+import testbed.demo.TestBedWindow
 
-public class NewtonsCradle {
-    public static final String[] text = {"Newtons Cradle:"};
+object NewtonsCradle {
+    @JvmField
+    val text: Array<String?> = arrayOf<String?>("Newtons Cradle:")
 
-    public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
-        World temp = testBedWindow.getWorld();
-        testBedWindow.setCamera(new Vectors2D(), 2);
+    @JvmStatic
+    fun load(testBedWindow: TestBedWindow) {
+        testBedWindow.world = World(Vec2(0.0, -9.81))
+        val temp = testBedWindow.world
+        testBedWindow.setCamera(Vec2(), 2.0)
 
-        double radius = 40.0;
-        int noOfCircles = 8;
-        double spread = ((noOfCircles - 1) * 80 / 2.0);
+        val radius = 40.0
+        val noOfCircles = 8
+        val spread = ((noOfCircles - 1) * 80 / 2.0)
 
-        double minX, maxX;
-        minX = -spread + 40;
+        var minX: Double
+        var maxX: Double
+        minX = -spread + 40
 
-        {
-            for (int i = 0; i < noOfCircles; i++) {
-                double x = minX + (i * 80);
-                Body b = new Body(new Circle(radius), x, -100);
-                b.restitution = 1;
-                b.staticFriction = 0;
-                b.dynamicFriction = 0;
-                temp.addBody(b);
+        run {
+            for (i in 0..<noOfCircles) {
+                val x = minX + (i * 80)
+                val b = Body(Circle(radius), x, -100.0)
+                b.restitution = 1.0
+                b.staticFriction = 0.0
+                b.dynamicFriction = 0.0
+                temp.addBody(b)
 
-                Joint j = new JointToPoint(new Vectors2D(x, 200), b, 300, 200000, 1000, true, new Vectors2D());
-                temp.addJoint(j);
+                val j: Joint = JointToPoint(Vec2(x, 200.0), b, 300.0, 200000.0, 1000.0, true, Vec2())
+                temp.addJoint(j)
             }
         }
 
-        {
-            minX -= 80;
-            Body b = new Body(new Circle(radius), minX - 300, 200);
-            b.restitution = 1;
-            b.staticFriction = 0;
-            b.dynamicFriction = 0;
-            temp.addBody(b);
+        run {
+            minX -= 80.0
+            val b = Body(Circle(radius), minX - 300, 200.0)
+            b.restitution = 1.0
+            b.staticFriction = 0.0
+            b.dynamicFriction = 0.0
+            temp.addBody(b)
 
-            Joint j = new JointToPoint(new Vectors2D(minX, 200), b, 300, 200000, 1000, true, new Vectors2D());
-            temp.addJoint(j);
+            val j: Joint = JointToPoint(Vec2(minX, 200.0), b, 300.0, 200000.0, 1000.0, true, Vec2())
+            temp.addJoint(j)
         }
     }
 }

@@ -1,17 +1,33 @@
-package library.rays;
+package library.rays
 
-import library.dynamics.Body;
-import library.math.Vectors2D;
+import library.dynamics.Body
+import library.math.Vec2
 
 /**
  * Ray information class to store relevant data about rays and any intersection found.
  */
-public class RayInformation {
-    private final Body b;
-    private final Vectors2D coord;
+class RayInformation {
+    /**
+     * Getter for body variable.
+     *
+     * @return returns b variable of type Body.
+     */
+    val b: Body?
 
+    /**
+     * Getter for coord variable.
+     *
+     * @return returns coord variable of type Vectors2D.
+     */
+    val coord: Vec2
+
+    /**
+     * Getter for index variable.
+     *
+     * @return returns index variable of type int.
+     */
     // Poly index is the first index of the line of intersection found
-    private final int polyIndex;
+    val index: Int
 
     /**
      * Constructor to store information about a ray intersection.
@@ -21,50 +37,23 @@ public class RayInformation {
      * @param y     y position of intersection.
      * @param index Index of shapes side that intersection intersects.
      */
-    public RayInformation(Body b, double x, double y, int index) {
-        this.b = b;
-        coord = new Vectors2D(x, y);
-        polyIndex = index;
+    constructor(b: Body?, x: Double, y: Double, index: Int) {
+        this.b = b
+        coord = Vec2(x, y)
+        this.index = index
     }
 
     /**
      * Convenience constructor equivalent to
-     * {@link #RayInformation(Body, double, double, int)}
+     * [.RayInformation]
      *
      * @param b     Body involved with ray intersection.
      * @param v     x/y position of intersection.
      * @param index Index of shapes side that intersection intersects.
      */
-    public RayInformation(Body b, Vectors2D v, int index) {
-        this.b = b;
-        coord = v.copy();
-        polyIndex = index;
-    }
-
-    /**
-     * Getter for coord variable.
-     *
-     * @return returns coord variable of type Vectors2D.
-     */
-    public Vectors2D getCoord() {
-        return coord;
-    }
-
-    /**
-     * Getter for body variable.
-     *
-     * @return returns b variable of type Body.
-     */
-    public Body getB() {
-        return b;
-    }
-
-    /**
-     * Getter for index variable.
-     *
-     * @return returns index variable of type int.
-     */
-    public int getIndex() {
-        return polyIndex;
+    constructor(b: Body?, v: Vec2, index: Int) {
+        this.b = b
+        coord = v.copy()
+        this.index = index
     }
 }

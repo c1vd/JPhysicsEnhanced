@@ -1,27 +1,21 @@
-package testbed.demo.input;
+package testbed.demo.input
 
-import testbed.demo.TestBedWindow;
+import testbed.demo.TestBedWindow
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-public class ColourMenuInput extends TestbedControls implements ActionListener {
-    public ColourMenuInput(TestBedWindow testBedWindow) {
-        super(testBedWindow);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        switch (event.getActionCommand()) {
-            case "Default" -> TESTBED.PAINT_SETTINGS.defaultColourScheme();
-            case "Box2d" -> TESTBED.PAINT_SETTINGS.box2dColourScheme();
-            case "Monochromatic" -> TESTBED.PAINT_SETTINGS.monochromaticColourScheme();
-            case "Display Grid" -> TESTBED.PAINT_SETTINGS.setDrawGrid(!TESTBED.PAINT_SETTINGS.getDrawGrid());
-            case "Display Shapes" -> TESTBED.PAINT_SETTINGS.setDrawShapes(!TESTBED.PAINT_SETTINGS.getDrawShapes());
-            case "Display Joints" -> TESTBED.PAINT_SETTINGS.setDrawJoints(!TESTBED.PAINT_SETTINGS.getDrawJoints());
-            case "Display AABBs" -> TESTBED.PAINT_SETTINGS.setDrawAABBs(!TESTBED.PAINT_SETTINGS.getDrawAABBs());
-            case "Display Contacts" -> TESTBED.PAINT_SETTINGS.setDrawContacts(!TESTBED.PAINT_SETTINGS.getDrawContacts());
-            case "Display COMs" -> TESTBED.PAINT_SETTINGS.setDrawCOMs(!TESTBED.PAINT_SETTINGS.getDrawCOMs());
+class ColourMenuInput(testBedWindow: TestBedWindow) : TestbedControls(testBedWindow), ActionListener {
+    override fun actionPerformed(event: ActionEvent) {
+        when (event.getActionCommand()) {
+            "Default" -> TESTBED.pAINT_SETTINGS.defaultColourScheme()
+            "Box2d" -> TESTBED.pAINT_SETTINGS.box2dColourScheme()
+            "Monochromatic" -> TESTBED.pAINT_SETTINGS.monochromaticColourScheme()
+            "Display Grid" -> TESTBED.pAINT_SETTINGS.drawGrid = !TESTBED.pAINT_SETTINGS.drawGrid
+            "Display Shapes" -> TESTBED.pAINT_SETTINGS.drawShapes = !TESTBED.pAINT_SETTINGS.drawShapes
+            "Display Joints" -> TESTBED.pAINT_SETTINGS.drawJoints = !TESTBED.pAINT_SETTINGS.drawJoints
+            "Display AABBs" -> TESTBED.pAINT_SETTINGS.drawAABBs = !TESTBED.pAINT_SETTINGS.drawAABBs
+            "Display Contacts" -> TESTBED.pAINT_SETTINGS.drawContacts = !TESTBED.pAINT_SETTINGS.drawContacts
+            "Display COMs" -> TESTBED.pAINT_SETTINGS.drawCOMs = !TESTBED.pAINT_SETTINGS.drawCOMs
         }
     }
 }

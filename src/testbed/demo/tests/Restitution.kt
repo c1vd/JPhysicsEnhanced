@@ -1,26 +1,27 @@
-package testbed.demo.tests;
+package testbed.demo.tests
 
-import library.dynamics.Body;
-import library.geometry.Polygon;
-import library.dynamics.World;
-import library.math.Vectors2D;
-import testbed.demo.TestBedWindow;
+import library.dynamics.Body
+import library.dynamics.World
+import library.geometry.Polygon
+import library.math.Vec2
+import testbed.demo.TestBedWindow
 
-public class Restitution {
-    public static final String[] text = {"Restitution:"};
+object Restitution {
+    @JvmField
+    val text: Array<String?> = arrayOf<String?>("Restitution:")
 
-    public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
-        World temp = testBedWindow.getWorld();
+    @JvmStatic
+    fun load(testBedWindow: TestBedWindow) {
+        testBedWindow.world = World(Vec2(0.0, -9.81))
+        val temp = testBedWindow.world
 
         //Three squares fall onto a a static platform
-        {
-            Body b = temp.addBody(new Body(new Polygon(200.0, 10.0), 0, -100));
-            b.setDensity(0);
-
-            for (int i = 0; i < 3; i++) {
-                Body b1 = temp.addBody(new Body(new Polygon(30.0, 30.0), -100 + (i * 100), 100));
-                b1.restitution = i / 3.0;
+        run {
+            val b = temp.addBody(Body(Polygon(200.0, 10.0), 0.0, -100.0))
+            b!!.setDensity(0.0)
+            for (i in 0..2) {
+                val b1 = temp.addBody(Body(Polygon(30.0, 30.0), (-100 + (i * 100)).toDouble(), 100.0))
+                b1!!.restitution = i / 3.0
             }
         }
     }

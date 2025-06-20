@@ -1,70 +1,58 @@
-package library.explosions;
+package library.explosions
 
-import library.dynamics.Body;
-import library.math.Vectors2D;
-import testbed.ColourSettings;
-import testbed.Camera;
-
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
+import library.dynamics.Body
+import library.math.Vec2
+import testbed.Camera
+import testbed.ColourSettings
+import java.awt.Graphics2D
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Line2D
 
 /**
  * Models proximity explosions.
  */
-public class ProximityExplosion implements Explosion {
-    private final int proximity;
-    private Vectors2D epicentre;
-
-    /**
-     * Constructor.
-     *
-     * @param epicentre The epicentre of the explosion.
-     * @param radius    The proximity in which bodies are effected.
-     */
-    public ProximityExplosion(Vectors2D epicentre, int radius) {
-        this.epicentre = epicentre;
-        proximity = radius;
-    }
-
+class ProximityExplosion
+/**
+ * Constructor.
+ *
+ * @param epicentre The epicentre of the explosion.
+ * @param proximity    The proximity in which bodies are effected.
+ */(private var epicentre: Vec2, private val proximity: Int) : Explosion {
     /**
      * Sets the epicentre to a different coordinate.
      *
      * @param v The vector position of the new epicentre.
      */
-    @Override
-    public void setEpicentre(Vectors2D v) {
-        epicentre = v;
+    override fun setEpicentre(v: Vec2) {
+        epicentre = v
     }
 
-    public ArrayList<Body> bodiesEffected = new ArrayList<>();
+    var bodiesEffected: ArrayList<Body> = ArrayList<Body>()
 
     /**
      * Updates the arraylist to reevaluate what bodies are effected/within the proximity.
      *
      * @param bodiesToEvaluate Arraylist of bodies in the world to check.
      */
-    @Override
-    public void update(ArrayList<Body> bodiesToEvaluate) {
-        bodiesEffected.clear();
-        for (Body b : bodiesToEvaluate) {
-            Vectors2D blastDist = b.position.subtract(epicentre);
+    override fun update(bodiesToEvaluate: ArrayList<Body>) {
+        bodiesEffected.clear()
+        for (b in bodiesToEvaluate) {
+            val blastDist = b.position - epicentre
             if (blastDist.length() <= proximity) {
-                bodiesEffected.add(b);
+                bodiesEffected.add(b)
             }
         }
     }
 
-    private final ArrayList<Vectors2D> linesToBodies = new ArrayList<>();
+    private val linesToBodies = ArrayList<Vec2>()
 
     /**
      * Updates the lines to body array for the debug drawer.
      */
-    public void updateLinesToBody() {
-        linesToBodies.clear();
-        for (Body b : bodiesEffected) {
-            linesToBodies.add(b.position);
+    fun updateLinesToBody() {
+        linesToBodies.clear()
+        for (b in bodiesEffected) {
+            linesToBodies.add(b.position)
         }
     }
 
@@ -75,21 +63,34 @@ public class ProximityExplosion implements Explosion {
      * @param paintSettings Colour settings to draw the objects to screen with
      * @param camera        Camera class used to convert points from world space to view space
      */
-    @Override
-    public void draw(Graphics2D g, ColourSettings paintSettings, Camera camera) {
-        g.setColor(paintSettings.proximity);
-        Vectors2D circlePotion = camera.convertToScreen(epicentre);
-        double proximityRadius = camera.scaleToScreenXValue(proximity);
-        g.draw(new Ellipse2D.Double(circlePotion.x - proximityRadius, circlePotion.y - proximityRadius, 2 * proximityRadius, 2 * proximityRadius));
+    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
+        g.color = paintSettings.proximity
+        val circlePotion = camera.convertToScreen(epicentre)
+        val proximityRadius = camera.scaleToScreenXValue(proximity.toDouble())
+        g.draw(
+            Ellipse2D.Double(
+                circlePotion.x - proximityRadius,
+                circlePotion.y - proximityRadius,
+                2 * proximityRadius,
+                2 * proximityRadius
+            )
+        )
 
-        updateLinesToBody();
-        for (Vectors2D p : linesToBodies) {
-            g.setColor(paintSettings.linesToObjects);
-            Vectors2D worldCoord = camera.convertToScreen(p);
-            g.draw(new Line2D.Double(circlePotion.x, circlePotion.y, worldCoord.x, worldCoord.y));
+        updateLinesToBody()
+        for (p in linesToBodies) {
+            g.setColor(paintSettings.linesToObjects)
+            val worldCoord = camera.convertToScreen(p)
+            g.draw(Line2D.Double(circlePotion.x, circlePotion.y, worldCoord.x, worldCoord.y))
 
-            double lineToRadius = camera.scaleToScreenXValue(paintSettings.CIRCLE_RADIUS);
-            g.fill(new Ellipse2D.Double(worldCoord.x - lineToRadius, worldCoord.y - lineToRadius, 2 * lineToRadius, 2 * lineToRadius));
+            val lineToRadius = camera.scaleToScreenXValue(paintSettings.CIRCLE_RADIUS.toDouble())
+            g.fill(
+                Ellipse2D.Double(
+                    worldCoord.x - lineToRadius,
+                    worldCoord.y - lineToRadius,
+                    2 * lineToRadius,
+                    2 * lineToRadius
+                )
+            )
         }
     }
 
@@ -98,17 +99,16 @@ public class ProximityExplosion implements Explosion {
      *
      * @param blastPower Blast magnitude.
      */
-    @Override
-    public void applyBlastImpulse(double blastPower) {
-        for (Body b : bodiesEffected) {
-            Vectors2D blastDir = b.position.subtract(epicentre);
-            double distance = blastDir.length();
-            if (distance == 0) return;
+    override fun applyBlastImpulse(blastPower: Double) {
+        for (b in bodiesEffected) {
+            val blastDir = b.position - epicentre
+            val distance = blastDir.length()
+            if (distance == 0.0) return
 
             //Not physically correct as it should be blast * radius to object ^ 2 as the pressure of an explosion in 2D dissipates
-            double invDistance = 1 / distance;
-            double impulseMag = blastPower * invDistance;
-            b.applyLinearImpulseToCentre(blastDir.normalize().scalar(impulseMag));
+            val invDistance = 1 / distance
+            val impulseMag = blastPower * invDistance
+            b.applyLinearImpulseToCentre(blastDir.normalized.scalar(impulseMag))
         }
     }
 }

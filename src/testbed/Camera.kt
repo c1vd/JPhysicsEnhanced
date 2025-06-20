@@ -1,93 +1,86 @@
-package testbed;
+package testbed
 
-import library.math.Vectors2D;
-import testbed.demo.TestBedWindow;
+import library.math.Vec2
+import testbed.demo.TestBedWindow
 
-public class Camera {
-    private final double aspectRatio;
-    public double zoom;
-    public int width;
-    public int height;
-    public Vectors2D centre;
-    private TestBedWindow panel;
+class Camera(windowWidth: Int, windowHeight: Int, testWindow: TestBedWindow) {
+    private val aspectRatio: Double
+    var zoom: Double = 1.0
+        set(zoom) {
+            assert(zoom > 0)
+            field = zoom
+        }
+    var width: Int
+    var height: Int
 
-    protected Vectors2D pointClicked;
+    @JvmField
+    var centre: Vec2
+    private val panel: TestBedWindow
 
-    public Vectors2D getPointClicked(){
-        return pointClicked;
+    var pointClicked: Vec2? = null
+
+    var upperBound: Vec2 = Vec2()
+    var lowerBound: Vec2 = Vec2()
+
+    init {
+        centre = Vec2(0.0, 0.0)
+        zoom = 1.0
+        this.width = windowWidth
+        this.height = windowHeight
+        panel = testWindow
+        aspectRatio = width * 1.0 / height
     }
 
-    public void setPointClicked(Vectors2D v){
-        pointClicked = v;
+    fun convertToScreen(v: Vec2): Vec2 {
+        updateViewSize(aspectRatio)
+        val boxWidth = (v.x - lowerBound.x) / (upperBound.x - lowerBound.x)
+        val boxHeight = (v.y - lowerBound.y) / (upperBound.y - lowerBound.y)
+
+        val output = Vec2()
+        output.x = boxWidth * panel.getWidth()
+        output.y = (1.0 - boxHeight) * (panel.getWidth() / aspectRatio)
+        return output
     }
 
-    public Camera(int windowWidth, int windowHeight, TestBedWindow testWindow) {
-        centre = new Vectors2D(0, 0);
-        zoom = 1.0;
-        this.width = windowWidth;
-        this.height = windowHeight;
-        panel = testWindow;
-        aspectRatio = width * 1.0 / height;
+    fun convertToWorld(vec: Vec2): Vec2 {
+        updateViewSize(aspectRatio)
+        val output = Vec2()
+        val distAlongWindowXAxis = vec.x / panel.getWidth()
+        output.x = (1.0 - distAlongWindowXAxis) * lowerBound.x + distAlongWindowXAxis * upperBound.x
+
+        val aspectHeight = panel.getWidth() / aspectRatio
+        val distAlongWindowYAxis = (aspectHeight - vec.y) / aspectHeight
+        output.y = (1.0 - distAlongWindowYAxis) * lowerBound.y + distAlongWindowYAxis * upperBound.y
+        return output
     }
 
-    Vectors2D upperBound = new Vectors2D();
-    Vectors2D lowerBound = new Vectors2D();
-
-    public Vectors2D convertToScreen(Vectors2D v) {
-        updateViewSize(aspectRatio);
-        double boxWidth = (v.x - lowerBound.x) / (upperBound.x - lowerBound.x);
-        double boxHeight = (v.y - lowerBound.y) / (upperBound.y - lowerBound.y);
-
-        Vectors2D output = new Vectors2D();
-        output.x = boxWidth * panel.getWidth();
-        output.y = (1.0 - boxHeight) * (panel.getWidth() / aspectRatio);
-        return output;
+    private fun updateViewSize(aspectRatio: Double) {
+        var extents = Vec2(aspectRatio * 200, 200.0)
+        extents = extents.scalar(zoom)
+        upperBound = centre + extents
+        lowerBound = centre - extents
     }
 
-    public Vectors2D convertToWorld(Vectors2D vec) {
-        updateViewSize(aspectRatio);
-        Vectors2D output = new Vectors2D();
-        double distAlongWindowXAxis = vec.x / panel.getWidth();
-        output.x = (1.0 - distAlongWindowXAxis) * lowerBound.x + distAlongWindowXAxis * upperBound.x;
-
-        double aspectHeight = panel.getWidth() / aspectRatio;
-        double distAlongWindowYAxis = (aspectHeight - vec.y) / aspectHeight;
-        output.y = (1.0 - distAlongWindowYAxis) * lowerBound.y + distAlongWindowYAxis * upperBound.y;
-        return output;
+    fun scaleToScreenXValue(radius: Double): Double {
+        val aspectRatio = width * 1.0 / height
+        var extents = Vec2(aspectRatio * 200, 200.0)
+        extents = extents.scalar(zoom)
+        val upperBound = centre + extents
+        val lowerBound = centre - extents
+        val w = radius / (upperBound.x - lowerBound.x)
+        return w * panel.getWidth()
     }
 
-    private void updateViewSize(double aspectRatio) {
-        Vectors2D extents = new Vectors2D(aspectRatio * 200, 200);
-        extents = extents.scalar(zoom);
-        upperBound = centre.addi(extents);
-        lowerBound = centre.subtract(extents);
+    fun transformCentre(v: Vec2) {
+        centre.add(v)
     }
 
-    public double scaleToScreenXValue(double radius) {
-        double aspectRatio = width * 1.0 / height;
-        Vectors2D extents = new Vectors2D(aspectRatio * 200, 200);
-        extents = extents.scalar(zoom);
-        Vectors2D upperBound = centre.addi(extents);
-        Vectors2D lowerBound = centre.subtract(extents);
-        double w = radius / (upperBound.x - lowerBound.x);
-        return w * panel.getWidth();
+    fun setCentre(centre: Vec2) {
+        this.centre = centre
     }
 
-    public void transformCentre(Vectors2D v) {
-        centre.add(v);
-    }
-
-    public void setCentre(Vectors2D centre) {
-        this.centre = centre;
-    }
-
-    public void setZoom(double zoom) {
-        assert (zoom > 0);
-        this.zoom = zoom;
-    }
-
-    public void reset() {
-        setCentre(new Vectors2D());
-        setZoom(1.0);
+    fun reset() {
+        setCentre(Vec2())
+        zoom = 1.0
     }
 }

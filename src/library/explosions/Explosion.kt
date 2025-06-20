@@ -1,23 +1,21 @@
-package library.explosions;
+package library.explosions
 
-import library.dynamics.Body;
-import library.math.Vectors2D;
-import testbed.Camera;
-import testbed.ColourSettings;
-
-import java.awt.*;
-import java.util.ArrayList;
+import library.dynamics.Body
+import library.math.Vec2
+import testbed.Camera
+import testbed.ColourSettings
+import java.awt.Graphics2D
 
 /**
  * Interface detailing what explosions need to include.
  */
-public interface Explosion {
+interface Explosion {
     /**
      * Applies a blast impulse to the effected bodies.
      *
      * @param blastPower The impulse magnitude.
      */
-    void applyBlastImpulse(double blastPower);
+    fun applyBlastImpulse(blastPower: Double)
 
     /**
      * Debug draw method for explosion and the effected objects.
@@ -26,19 +24,19 @@ public interface Explosion {
      * @param paintSettings Colour settings to draw the objects to screen with
      * @param camera        Camera class used to convert points from world space to view space
      */
-    void draw(Graphics2D g, ColourSettings paintSettings, Camera camera);
+    fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera)
 
     /**
      * Updates the arraylist to reevaluate what objects are effected/within the proximity.
      *
      * @param bodiesToEvaluate Arraylist of bodies in the world to check.
      */
-    void update(ArrayList<Body> bodiesToEvaluate);
+    fun update(bodiesToEvaluate: ArrayList<Body>)
 
     /**
      * Sets the epicentre to a different coordinate.
      *
      * @param v The vector position of the new epicentre.
      */
-    void setEpicentre(Vectors2D v);
+    fun setEpicentre(v: Vec2)
 }

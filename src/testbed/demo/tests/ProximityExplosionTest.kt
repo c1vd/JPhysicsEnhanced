@@ -1,24 +1,27 @@
-package testbed.demo.tests;
+package testbed.demo.tests
 
-import library.explosions.ProximityExplosion;
-import library.dynamics.World;
-import library.math.Vectors2D;
-import testbed.demo.TestBedWindow;
+import library.dynamics.World
+import library.explosions.ProximityExplosion
+import library.math.Vec2
+import testbed.demo.TestBedWindow
 
-public class ProximityExplosionTest {
-    public static final String[] text = {"Proximity Explosions:", "Left click: casts an explosion"};
-    public static boolean active = false;
-    public static ProximityExplosion p;
+object ProximityExplosionTest {
+    @JvmField
+    val text: Array<String?> = arrayOf<String?>("Proximity Explosions:", "Left click: casts an explosion")
+    @JvmField
+    var active: Boolean = false
+    @JvmField
+    var p: ProximityExplosion? = null
 
-    public static void load(TestBedWindow testBedWindow) {
-        active = true;
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
-        testBedWindow.setCamera(new Vectors2D(0, 300), 2.0);
+    @JvmStatic
+    fun load(testBedWindow: TestBedWindow) {
+        active = true
+        testBedWindow.world = World(Vec2(0.0, -9.81))
+        testBedWindow.setCamera(Vec2(0.0, 300.0), 2.0)
 
-        testBedWindow.buildExplosionDemo();
+        testBedWindow.buildExplosionDemo()
 
-        p = new ProximityExplosion(new Vectors2D(), 200);
-        testBedWindow.add(p);
-
+        p = ProximityExplosion(Vec2(), 200)
+        testBedWindow.add(p)
     }
 }

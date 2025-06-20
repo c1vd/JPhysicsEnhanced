@@ -1,30 +1,30 @@
-package testbed;
+package testbed
 
 /**
  * Timer class.
  */
-public class Timer {
-    public long prevTime;
+class Timer {
+    var prevTime: Long = 0
 
     /**
      * No-argument constructor initializes instance variables to current time
      */
-    public Timer() {
-        reset();
+    init {
+        reset()
     }
 
     /**
      * Resets instance values to current time
      */
-    public void reset() {
-        prevTime = System.nanoTime();
+    fun reset() {
+        prevTime = System.nanoTime()
     }
 
     /**
      * Method to get the time difference between the prevTime and the current time.
      * @return long value with the time difference since prevTime was set
      */
-    public long timePassed() {
-        return System.nanoTime() - prevTime;
+    fun timePassed(): Long {
+        return System.nanoTime() - prevTime
     }
 }

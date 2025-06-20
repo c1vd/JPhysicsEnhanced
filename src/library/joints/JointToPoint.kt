@@ -1,20 +1,37 @@
-package library.joints;
+package library.joints
 
-import library.dynamics.Body;
-import library.math.Matrix2D;
-import library.math.Vectors2D;
-import testbed.ColourSettings;
-import testbed.Camera;
-
-import java.awt.*;
-import java.awt.geom.Line2D;
+import library.dynamics.Body
+import library.math.Matrix2D
+import library.math.Vec2
+import testbed.Camera
+import testbed.ColourSettings
+import java.awt.Graphics2D
+import java.awt.geom.Line2D
 
 /**
  * Class for a joint between a body and a point in world space.
  */
-public class JointToPoint extends Joint {
-    private final Vectors2D pointAttachedTo;
-
+class JointToPoint
+/**
+ * Convenience constructor that works like
+ * [.JointToPoint]
+ *
+ * @param pointAttachedTo         The point the joint is attached to
+ * @param b1            First body the joint is attached to
+ * @param jointLength   The desired distance of the joint between two points/bodies
+ * @param jointConstant The strength of the joint
+ * @param dampening     The dampening constant to use for the joints forces
+ * @param canGoSlack    Boolean whether the joint can go slack or not
+ * @param offset1       Offset to be applied to the location of the joint relative to b1's object space
+ */(
+    b1: Body,
+    private val pointAttachedTo: Vec2,
+    jointLength: Double,
+    jointConstant: Double,
+    dampening: Double,
+    canGoSlack: Boolean,
+    offset1: Vec2
+) : Joint(b1, jointLength, jointConstant, dampening, canGoSlack, offset1) {
     /**
      * Constructor for a joint between a body and a point.
      *
@@ -26,41 +43,28 @@ public class JointToPoint extends Joint {
      * @param canGoSlack    Boolean whether the joint can go slack or not
      * @param offset1       Offset to be applied to the location of the joint relative to b1's object space
      */
-    public JointToPoint(Vectors2D point, Body b1, double jointLength, double jointConstant, double dampening, boolean canGoSlack, Vectors2D offset1) {
-        this(b1, point, jointLength, jointConstant, dampening, canGoSlack, offset1);
-    }
-
-    /**
-     * Convenience constructor that works like
-     * {@link #JointToPoint(Vectors2D, Body, double, double, double, boolean, Vectors2D)}
-     *
-     * @param point         The point the joint is attached to
-     * @param b1            First body the joint is attached to
-     * @param jointLength   The desired distance of the joint between two points/bodies
-     * @param jointConstant The strength of the joint
-     * @param dampening     The dampening constant to use for the joints forces
-     * @param canGoSlack    Boolean whether the joint can go slack or not
-     * @param offset1       Offset to be applied to the location of the joint relative to b1's object space
-     */
-    public JointToPoint(Body b1, Vectors2D point, double jointLength, double jointConstant, double dampening, boolean canGoSlack, Vectors2D offset1) {
-        super(b1, jointLength, jointConstant, dampening, canGoSlack, offset1);
-        this.pointAttachedTo = point;
-    }
+    constructor(
+        point: Vec2,
+        b1: Body,
+        jointLength: Double,
+        jointConstant: Double,
+        dampening: Double,
+        canGoSlack: Boolean,
+        offset1: Vec2
+    ) : this(b1, point, jointLength, jointConstant, dampening, canGoSlack, offset1)
 
     /**
      * Applies tension to the body attached to the joint.
      */
-    @Override
-    public void applyTension() {
-        Matrix2D mat1 = new Matrix2D(object1.orientation);
-        this.object1AttachmentPoint = object1.position.addi(mat1.mul(offset1, new Vectors2D()));
+    override fun applyTension() {
+        val mat1 = Matrix2D(object1.orientation)
+        this.object1AttachmentPoint = object1.position + mat1.mul(offset1, Vec2())
 
-        double tension = calculateTension();
-        Vectors2D distance = pointAttachedTo.subtract(object1AttachmentPoint);
-        distance.normalize();
+        val tension = calculateTension()
+        val distance = (pointAttachedTo - object1AttachmentPoint!!).normalized
 
-        Vectors2D impulse = distance.scalar(tension);
-        object1.applyLinearImpulse(impulse, object1AttachmentPoint.subtract(object1.position));
+        val impulse = distance.scalar(tension)
+        object1.applyLinearImpulse(impulse, object1AttachmentPoint!! - object1.position)
     }
 
     /**
@@ -68,16 +72,15 @@ public class JointToPoint extends Joint {
      *
      * @return double value of the tension force between the point and attached bodies point
      */
-    @Override
-    public double calculateTension() {
-        double distance = object1AttachmentPoint.subtract(pointAttachedTo).length();
+    override fun calculateTension(): Double {
+        val distance = (object1AttachmentPoint!! - pointAttachedTo).length()
         if (distance < naturalLength && canGoSlack) {
-            return 0;
+            return 0.0
         }
-        double extensionRatio = distance - naturalLength;
-        double tensionDueToHooksLaw = extensionRatio * springConstant;
-        double tensionDueToMotionDamping = dampeningConstant * rateOfChangeOfExtension();
-        return tensionDueToHooksLaw + tensionDueToMotionDamping;
+        val extensionRatio = distance - naturalLength
+        val tensionDueToHooksLaw = extensionRatio * springConstant
+        val tensionDueToMotionDamping = dampeningConstant * rateOfChangeOfExtension()
+        return tensionDueToHooksLaw + tensionDueToMotionDamping
     }
 
     /**
@@ -85,13 +88,13 @@ public class JointToPoint extends Joint {
      *
      * @return double value of the rate of change
      */
-    @Override
-    public double rateOfChangeOfExtension() {
-        Vectors2D distance = pointAttachedTo.subtract(object1AttachmentPoint);
-        distance.normalize();
-        Vectors2D relativeVelocity = object1.velocity.negativeVec().subtract(object1AttachmentPoint.subtract(object1.position).crossProduct(object1.angularVelocity));
+    override fun rateOfChangeOfExtension(): Double {
+        val distance = (pointAttachedTo - object1AttachmentPoint!!).normalized
 
-        return relativeVelocity.dotProduct(distance);
+        val relativeVelocity =
+            -object1.velocity - object1AttachmentPoint!! - (object1.position).crossProduct(object1.angularVelocity)
+
+        return relativeVelocity.dotProduct(distance)
     }
 
     /**
@@ -101,11 +104,10 @@ public class JointToPoint extends Joint {
      * @param paintSettings Colour settings to draw the objects to screen with
      * @param camera        Camera class used to convert points from world space to view space
      */
-    @Override
-    public void draw(Graphics2D g, ColourSettings paintSettings, Camera camera) {
-        g.setColor(paintSettings.joints);
-        Vectors2D obj1Pos = camera.convertToScreen(object1AttachmentPoint);
-        Vectors2D obj2Pos = camera.convertToScreen(pointAttachedTo);
-        g.draw(new Line2D.Double(obj1Pos.x, obj1Pos.y, obj2Pos.x, obj2Pos.y));
+    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
+        g.color = paintSettings.joints
+        val obj1Pos = camera.convertToScreen(object1AttachmentPoint!!)
+        val obj2Pos = camera.convertToScreen(pointAttachedTo)
+        g.draw(Line2D.Double(obj1Pos.x, obj1Pos.y, obj2Pos.x, obj2Pos.y))
     }
 }

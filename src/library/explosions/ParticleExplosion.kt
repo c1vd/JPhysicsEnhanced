@@ -1,42 +1,21 @@
-package library.explosions;
+package library.explosions
 
-import library.dynamics.Body;
-import library.dynamics.World;
-import library.geometry.Circle;
-import library.math.Matrix2D;
-import library.math.Vectors2D;
+import library.dynamics.Body
+import library.dynamics.World
+import library.geometry.Circle
+import library.math.Matrix2D
+import library.math.Vec2
 
 /**
  * Models particle explosions.
  */
-public class ParticleExplosion {
-    private final int noOfParticles;
-    private Vectors2D epicentre;
-    private final Body[] particles;
-    private double lifespan;
-
+class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: Int) {
     /**
      * Getter to return the list of particles in the world.
      *
      * @return Array of bodies.
      */
-    public Body[] getParticles() {
-        return particles;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param epicentre     Vector location of explosion epicenter.
-     * @param noOfParticles Total number of particles the explosion has.
-     * @param life          The life time of the particle.
-     */
-    public ParticleExplosion(Vectors2D epicentre, int noOfParticles, double life) {
-        this.epicentre = epicentre;
-        this.noOfParticles = noOfParticles;
-        particles = new Body[noOfParticles];
-        lifespan = life;
-    }
+    val particles: Array<Body?> = arrayOfNulls(noOfParticles)
 
     /**
      * Creates particles in the supplied world.
@@ -46,23 +25,23 @@ public class ParticleExplosion {
      * @param radius  The distance away from the epicenter the particles are placed.
      * @param world   The world the particles are created in.
      */
-    public void createParticles(double size, int density, int radius, World world) {
-        double separationAngle = 6.28319 / noOfParticles;
-        Vectors2D distanceFromCentre = new Vectors2D(0, radius);
-        Matrix2D rotate = new Matrix2D(separationAngle);
-        for (int i = 0; i < noOfParticles; i++) {
-            Vectors2D particlePlacement = epicentre.addi(distanceFromCentre);
-            Body b = new Body(new Circle(size), particlePlacement.x, particlePlacement.y);
-            b.setDensity(density);
-            b.restitution = 1;
-            b.staticFriction = 0;
-            b.dynamicFriction = 0;
-            b.affectedByGravity = false;
-            b.linearDampening = 0;
-            b.particle = true;
-            world.addBody(b);
-            particles[i] = b;
-            rotate.mul(distanceFromCentre);
+    fun createParticles(size: Double, density: Int, radius: Int, world: World) {
+        val separationAngle = 6.28319 / noOfParticles
+        val distanceFromCentre = Vec2(0.0, radius.toDouble())
+        val rotate = Matrix2D(separationAngle)
+        for (i in 0..<noOfParticles) {
+            val particlePlacement = epicentre + distanceFromCentre
+            val b = Body(Circle(size), particlePlacement.x, particlePlacement.y)
+            b.setDensity(density.toDouble())
+            b.restitution = 1.0
+            b.staticFriction = 0.0
+            b.dynamicFriction = 0.0
+            b.affectedByGravity = false
+            b.linearDampening = 0.0
+            b.particle = true
+            world.addBody(b)
+            particles[i] = b
+            rotate.mul(distanceFromCentre)
         }
     }
 
@@ -71,11 +50,11 @@ public class ParticleExplosion {
      *
      * @param blastPower The impulse magnitude.
      */
-    public void applyBlastImpulse(double blastPower) {
-        Vectors2D line;
-        for (Body b : particles) {
-            line = b.position.subtract(epicentre);
-            b.velocity.set(line.scalar(blastPower));
+    fun applyBlastImpulse(blastPower: Double) {
+        var line: Vec2
+        for (b in particles) {
+            line = b!!.position - epicentre
+            b.velocity.set(line.scalar(blastPower))
         }
     }
 }

@@ -1,48 +1,38 @@
-package library.dynamics;
+package library.dynamics
 
-import library.collision.AABB;
-import library.collision.Arbiter;
-import library.joints.Joint;
-import library.math.Vectors2D;
-import testbed.ColourSettings;
-import testbed.Camera;
-
-import java.awt.*;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
+import library.collision.AABB
+import library.collision.Arbiter
+import library.joints.Joint
+import library.math.Vec2
+import testbed.Camera
+import testbed.ColourSettings
+import java.awt.Graphics2D
+import java.awt.geom.Line2D
 
 /**
  * Class for creating a world with iterative solver structure.
  */
-public class World {
-    private Vectors2D gravity;
+class World {
+    var gravity: Vec2
 
     /**
      * Constructor
      *
      * @param gravity The strength of gravity in the world.
      */
-    public World(Vectors2D gravity) {
-        this.gravity = gravity;
+    constructor(gravity: Vec2) {
+        this.gravity = gravity
     }
 
     /**
      * Default constructor
      */
-    public World() {
-        gravity = new Vectors2D(0, 0);
+    constructor() {
+        gravity = Vec2(0.0, 0.0)
     }
 
-    /**
-     * Sets gravity.
-     *
-     * @param gravity The strength of gravity in the world.
-     */
-    public void setGravity(Vectors2D gravity) {
-        this.gravity = gravity;
-    }
-
-    public ArrayList<Body> bodies = new ArrayList<>();
+    @JvmField
+    var bodies: ArrayList<Body> = ArrayList<Body>()
 
     /**
      * Adds a body to the world
@@ -50,9 +40,9 @@ public class World {
      * @param b Body to add.
      * @return Returns the newly added body.
      */
-    public Body addBody(Body b) {
-        bodies.add(b);
-        return b;
+    fun addBody(b: Body?): Body? {
+        bodies.add(b!!)
+        return b
     }
 
     /**
@@ -60,11 +50,12 @@ public class World {
      *
      * @param b The body to remove from the world.
      */
-    public void removeBody(Body b) {
-        bodies.remove(b);
+    fun removeBody(b: Body?) {
+        bodies.remove(b)
     }
 
-    public ArrayList<Joint> joints = new ArrayList<>();
+    @JvmField
+    var joints: ArrayList<Joint> = ArrayList<Joint>()
 
     /**
      * Adds a joint to the world.
@@ -72,9 +63,9 @@ public class World {
      * @param j The joint to add.
      * @return Returns the joint added to the world.
      */
-    public Joint addJoint(Joint j) {
-        joints.add(j);
-        return j;
+    fun addJoint(j: Joint?): Joint? {
+        joints.add(j!!)
+        return j
     }
 
     /**
@@ -82,27 +73,27 @@ public class World {
      *
      * @param j The joint to remove from the world.
      */
-    public void removeJoint(Joint j) {
-        joints.remove(j);
+    fun removeJoint(j: Joint) {
+        joints.remove(j)
     }
 
-    public ArrayList<Arbiter> contacts = new ArrayList<>();
+    var contacts: ArrayList<Arbiter> = ArrayList()
 
     /**
      * The main time step method for the world to conduct an iteration of the current world call this method with a desired time step value.
      *
      * @param dt Timestep
      */
-    public void step(double dt) {
-        contacts.clear();
+    fun step(dt: Double) {
+        contacts.clear()
 
-        broadPhaseCheck();
+        broadPhaseCheck()
 
-        semiImplicit(dt);
+        semiImplicit(dt)
 
         //Correct positional errors from the discrete collisions
-        for (Arbiter contact : contacts) {
-            contact.penetrationResolution();
+        for (contact in contacts) {
+            contact.penetrationResolution()
         }
     }
 
@@ -111,23 +102,23 @@ public class World {
      *
      * @param dt Timestep
      */
-    private void semiImplicit(double dt) {
+    private fun semiImplicit(dt: Double) {
         //Applies tentative velocities
-        applyForces(dt);
+        applyForces(dt)
 
-        solve(dt);
+        solve(dt)
 
         //Integrate positions
-        for (Body b : bodies) {
-            if (b.invMass == 0) {
-                continue;
+        for (b in bodies) {
+            if (b.invMass == 0.0) {
+                continue
             }
 
-            b.position.add(b.velocity.scalar(dt));
-            b.setOrientation(b.orientation + (dt * b.angularVelocity));
+            b.position.add(b.velocity.scalar(dt))
+            b.orientation = b.orientation + (dt * b.angularVelocity)
 
-            b.force.set(0, 0);
-            b.torque = 0;
+            b.force.set(0.0, 0.0)
+            b.torque = 0.0
         }
     }
 
@@ -136,20 +127,20 @@ public class World {
      *
      * @param dt Timestep
      */
-    private void applyForces(double dt) {
-        for (Body b : bodies) {
-            if (b.invMass == 0) {
-                continue;
+    private fun applyForces(dt: Double) {
+        for (b in bodies) {
+            if (b.invMass == 0.0) {
+                continue
             }
 
-            applyLinearDrag(b);
+            applyLinearDrag(b)
 
             if (b.affectedByGravity) {
-                b.velocity.add(gravity.scalar(dt));
+                b.velocity.add(gravity.scalar(dt))
             }
 
-            b.velocity.add(b.force.scalar(b.invMass).scalar(dt));
-            b.angularVelocity += dt * b.invI * b.torque;
+            b.velocity.add(b.force.scalar(b.invMass).scalar(dt))
+            b.angularVelocity += dt * b.invI * b.torque
         }
     }
 
@@ -158,7 +149,7 @@ public class World {
      *
      * @param dt Timestep
      */
-    private void solve(double dt) {
+    private fun solve(dt: Double) {
         /*
         Resolve joints
         Note: this is removed from the iterations at this stage as the application of forces is different.
@@ -166,17 +157,14 @@ public class World {
         Early out could be used like in the collision solver
         This may change in the future and will be revised at a later date.
         */
-        for (
-                Joint j : joints) {
-            j.applyTension();
+        for (j in joints) {
+            j.applyTension()
         }
 
         //Resolve collisions
-        for (
-                int i = 0;
-                i < Settings.ITERATIONS; i++) {
-            for (Arbiter contact : contacts) {
-                contact.solve();
+        repeat(Settings.ITERATIONS) {
+            for (contact in contacts) {
+                contact.solve()
             }
         }
     }
@@ -186,30 +174,30 @@ public class World {
      *
      * @param b Body to apply drag to.
      */
-    private void applyLinearDrag(Body b) {
-        double velocityMagnitude = b.velocity.length();
-        double dragForceMagnitude = velocityMagnitude * velocityMagnitude * b.linearDampening;
-        Vectors2D dragForceVector = b.velocity.getNormalized().scalar(-dragForceMagnitude);
-        b.applyForceToCentre(dragForceVector);
+    private fun applyLinearDrag(b: Body) {
+        val velocityMagnitude = b.velocity.length()
+        val dragForceMagnitude = velocityMagnitude * velocityMagnitude * b.linearDampening
+        val dragForceVector = b.velocity.normalized.scalar(-dragForceMagnitude)
+        b.applyForceToCentre(dragForceVector)
     }
 
     /**
      * A discrete Broad phase check of collision detection.
      */
-    private void broadPhaseCheck() {
-        for (int i = 0; i < bodies.size(); i++) {
-            Body a = bodies.get(i);
+    private fun broadPhaseCheck() {
+        for (i in bodies.indices) {
+            val a = bodies[i]
 
-            for (int x = i + 1; x < bodies.size(); x++) {
-                Body b = bodies.get(x);
+            for (x in i + 1..<bodies.size) {
+                val b = bodies[x]
 
                 //Ignores static or particle objects
-                if (a.invMass == 0 && b.invMass == 0 || a.particle && b.particle) {
-                    continue;
+                if (a.invMass == 0.0 && b.invMass == 0.0 || a.particle && b.particle) {
+                    continue
                 }
 
                 if (AABB.AABBOverLap(a, b)) {
-                    narrowPhaseCheck(a, b);
+                    narrowPhaseCheck(a, b)
                 }
             }
         }
@@ -222,11 +210,11 @@ public class World {
      * @param a
      * @param b
      */
-    private void narrowPhaseCheck(Body a, Body b) {
-        Arbiter contactQuery = new Arbiter(a, b);
-        contactQuery.narrowPhase();
+    private fun narrowPhaseCheck(a: Body, b: Body) {
+        val contactQuery = Arbiter(a, b)
+        contactQuery.narrowPhase()
         if (contactQuery.contactCount > 0) {
-            contacts.add(contactQuery);
+            contacts.add(contactQuery)
         }
     }
 
@@ -234,30 +222,30 @@ public class World {
     /**
      * Clears all objects in the current world
      */
-    public void clearWorld() {
-        bodies.clear();
-        contacts.clear();
-        joints.clear();
+    fun clearWorld() {
+        bodies.clear()
+        contacts.clear()
+        joints.clear()
     }
 
     /**
      * Applies gravitational forces between to objects (force applied to centre of body)
      */
-    public void gravityBetweenObj() {
-        for (int a = 0; a < bodies.size(); a++) {
-            Body A = bodies.get(a);
-            for (int b = a + 1; b < bodies.size(); b++) {
-                Body B = bodies.get(b);
-                double distance = A.position.distance(B.position);
-                double force = Math.pow(6.67, -11) * A.mass * B.mass / (distance * distance);
-                Vectors2D direction = new Vectors2D(B.position.x - A.position.x, B.position.y - A.position.y);
-                direction = direction.scalar(force);
-                Vectors2D oppositeDir = new Vectors2D(-direction.x, -direction.y);
-                A.force.addi(direction);
-                B.force.addi(oppositeDir);
+    /*fun gravityBetweenObj() {
+        for (a in bodies.indices) {
+            val A = bodies[a]
+            for (b in a + 1..<bodies.size) {
+                val B = bodies[b]
+                val distance = A.position.distance(B.position)
+                val force = 6.67.pow(-11.0) * A.mass * B.mass / (distance * distance)
+                var direction = B.position - A.position
+                direction = direction.scalar(force)
+                val oppositeDir = Vec2(-direction.x, -direction.y)
+                A.force.addi(direction)
+                B.force.addi(oppositeDir)
             }
         }
-    }
+    }*/
 
     /**
      * Debug draw method for world objects.
@@ -266,23 +254,20 @@ public class World {
      * @param paintSettings Colour settings to draw the objects to screen with
      * @param camera        Camera class used to convert points from world space to view space
      */
-    public void drawContact(Graphics2D g, ColourSettings paintSettings, Camera camera) {
-        for (Arbiter contact : contacts) {
-            Vectors2D point = contact.contacts[0];
-            Vectors2D line;
-            Vectors2D beginningOfLine;
-            Vectors2D endOfLine;
+    fun drawContact(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
+        for (contact in contacts) {
+            val point = contact.contacts[0]
 
-            g.setColor(paintSettings.contactPoint);
-            line = contact.contactNormal.normal().scalar(paintSettings.TANGENT_LINE_SCALAR);
-            beginningOfLine = camera.convertToScreen(point.addi(line));
-            endOfLine = camera.convertToScreen(point.subtract(line));
-            g.draw(new Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y));
+            g.color = paintSettings.contactPoint
+            var line: Vec2 = contact.contactNormal.normal().scalar(paintSettings.TANGENT_LINE_SCALAR)
+            var beginningOfLine: Vec2 = camera.convertToScreen(point + line)
+            var endOfLine = camera.convertToScreen(point - line)
+            g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
 
-            line = contact.contactNormal.scalar(paintSettings.NORMAL_LINE_SCALAR);
-            beginningOfLine = camera.convertToScreen(point.addi(line));
-            endOfLine = camera.convertToScreen(point.subtract(line));
-            g.draw(new Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y));
+            line = contact.contactNormal.scalar(paintSettings.NORMAL_LINE_SCALAR)
+            beginningOfLine = camera.convertToScreen(point + line)
+            endOfLine = camera.convertToScreen(point - line)
+            g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
         }
     }
 }

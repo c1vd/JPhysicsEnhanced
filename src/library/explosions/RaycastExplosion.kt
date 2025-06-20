@@ -1,20 +1,28 @@
-package library.explosions;
+package library.explosions
 
-import library.dynamics.Body;
-import library.rays.Ray;
-import library.rays.RayInformation;
-import library.math.Vectors2D;
-import testbed.Camera;
-import testbed.ColourSettings;
-
-import java.awt.*;
-import java.util.ArrayList;
+import library.dynamics.Body
+import library.math.Vec2
+import library.rays.RayInformation
+import testbed.Camera
+import testbed.ColourSettings
+import java.awt.Graphics2D
 
 /**
  * Models raycast explosions.
  */
-public class RaycastExplosion implements Explosion {
-    private final RayScatter rayScatter;
+class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodies: ArrayList<Body>) : Explosion {
+    private val rayScatter: RayScatter = RayScatter(epicentre, noOfRays)
+
+    /**
+     * Sets the epicentre to a different coordinate.
+     *
+     * @param v The vector position of the new epicentre.
+     */
+    override fun setEpicentre(v: Vec2) {
+        rayScatter.setEpicentre(v)
+    }
+
+    var raysInContact: ArrayList<RayInformation> = ArrayList<RayInformation>()
 
     /**
      * Constructor
@@ -24,38 +32,24 @@ public class RaycastExplosion implements Explosion {
      * @param distance    Distance of projected rays.
      * @param worldBodies The world the rays effect and are projected in.
      */
-    public RaycastExplosion(Vectors2D epicentre, int noOfRays, int distance, ArrayList<Body> worldBodies) {
-        rayScatter = new RayScatter(epicentre, noOfRays);
-        rayScatter.castRays(distance);
-        update(worldBodies);
+    init {
+        rayScatter.castRays(distance)
+        update(worldBodies)
     }
-
-    /**
-     * Sets the epicentre to a different coordinate.
-     *
-     * @param v The vector position of the new epicentre.
-     */
-    @Override
-    public void setEpicentre(Vectors2D v) {
-        rayScatter.setEpicentre(v);
-    }
-
-    public ArrayList<RayInformation> raysInContact = new ArrayList<>();
 
     /**
      * Updates the arraylist to reevaluate what objects are effected/within the proximity.
      *
      * @param bodiesToEvaluate Arraylist of bodies in the world to check.
      */
-    @Override
-    public void update(ArrayList<Body> bodiesToEvaluate) {
-        raysInContact.clear();
-        rayScatter.updateRays(bodiesToEvaluate);
-        Ray[] rayArray = rayScatter.getRays();
-        for (Ray ray : rayArray) {
-            RayInformation rayInfo = ray.getRayInformation();
+    override fun update(bodiesToEvaluate: ArrayList<Body>) {
+        raysInContact.clear()
+        rayScatter.updateRays(bodiesToEvaluate)
+        val rayArray = rayScatter.rays
+        for (ray in rayArray) {
+            val rayInfo = ray.rayInformation
             if (rayInfo != null) {
-                raysInContact.add(rayInfo);
+                raysInContact.add(rayInfo)
             }
         }
     }
@@ -65,17 +59,16 @@ public class RaycastExplosion implements Explosion {
      *
      * @param blastPower The impulse magnitude.
      */
-    @Override
-    public void applyBlastImpulse(double blastPower) {
-        for (RayInformation ray : raysInContact) {
-            Vectors2D blastDir = ray.getCoord().subtract(rayScatter.getEpicentre());
-            double distance = blastDir.length();
-            if (distance == 0) return;
+    override fun applyBlastImpulse(blastPower: Double) {
+        for (ray in raysInContact) {
+            val blastDir = ray.coord - rayScatter.getEpicentre()
+            val distance = blastDir.length()
+            if (distance == 0.0) return
 
-            double invDistance = 1 / distance;
-            Vectors2D impulseMag = blastDir.normalize().scalar(blastPower * invDistance);
-            Body b = ray.getB();
-            b.applyLinearImpulse(impulseMag, ray.getCoord().subtract(b.position));
+            val invDistance = 1 / distance
+            val impulseMag = blastDir.normalized.scalar(blastPower * invDistance)
+            val b = ray.b
+            b!!.applyLinearImpulse(impulseMag, ray.coord - b.position)
         }
     }
 
@@ -86,9 +79,8 @@ public class RaycastExplosion implements Explosion {
      * @param paintSettings Colour settings to draw the objects to screen with
      * @param camera        Camera class used to convert points from world space to view space
      */
-    @Override
-    public void draw(Graphics2D g, ColourSettings paintSettings, Camera camera) {
-        rayScatter.draw(g, paintSettings, camera);
+    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
+        rayScatter.draw(g, paintSettings, camera)
     }
 }
 

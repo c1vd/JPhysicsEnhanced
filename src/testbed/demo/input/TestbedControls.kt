@@ -1,122 +1,137 @@
-package testbed.demo.input;
+package testbed.demo.input
 
-import library.explosions.ParticleExplosion;
-import library.explosions.ProximityExplosion;
-import library.math.Vectors2D;
-import library.dynamics.Settings;
-import testbed.Camera;
-import testbed.demo.TestBedWindow;
-import testbed.demo.tests.*;
+import library.dynamics.Settings
+import library.explosions.ParticleExplosion
+import library.explosions.ProximityExplosion
+import library.math.Vec2
+import testbed.Camera
+import testbed.demo.TestBedWindow
+import testbed.demo.tests.*
+import java.awt.event.MouseEvent
 
-import java.awt.event.MouseEvent;
+abstract class TestbedControls(protected val TESTBED: TestBedWindow) {
+    protected val CAMERA: Camera
 
-public abstract class TestbedControls {
-    protected final TestBedWindow TESTBED;
-    protected final Camera CAMERA;
-    protected static String currentDemo;
-
-    public TestbedControls(TestBedWindow testBedWindow) {
-        this.TESTBED = testBedWindow;
-        this.CAMERA = testBedWindow.getCamera();
-        currentDemo = "Chains";
+    init {
+        this.CAMERA = TESTBED.camera
     }
 
-    public void loadDemo(String demo) {
-        currentDemo = demo;
-        TESTBED.clearTestbedObjects();
-        resetUniqueEventHandlers();
-        switch (currentDemo) {
-            case "Chains" -> {
-                Chains.load(TESTBED);
-                TESTBED.setCurrentDemo(0);
+    fun loadDemo(demo: String) {
+        currentDemo = demo
+        TESTBED.clearTestbedObjects()
+        resetUniqueEventHandlers()
+        when (currentDemo) {
+            "Chains" -> {
+                Chains.load(TESTBED)
+                TESTBED.setCurrentDemo(0)
             }
-            case "Line of sight" -> {
-                LineOfSight.load(TESTBED);
-                TESTBED.setCurrentDemo(1);
+
+            "Line of sight" -> {
+                LineOfSight.load(TESTBED)
+                TESTBED.setCurrentDemo(1)
             }
-            case "Particle explosion" -> {
-                ParticleExplosionTest.load(TESTBED);
-                TESTBED.setCurrentDemo(2);
+
+            "Particle explosion" -> {
+                ParticleExplosionTest.load(TESTBED)
+                TESTBED.setCurrentDemo(2)
             }
-            case "Proximity explosion" -> {
-                ProximityExplosionTest.load(TESTBED);
-                TESTBED.setCurrentDemo(3);
+
+            "Proximity explosion" -> {
+                ProximityExplosionTest.load(TESTBED)
+                TESTBED.setCurrentDemo(3)
             }
-            case "Raycast explosion" -> {
-                RaycastExplosionTest.load(TESTBED);
-                TESTBED.setCurrentDemo(4);
+
+            "Raycast explosion" -> {
+                RaycastExplosionTest.load(TESTBED)
+                TESTBED.setCurrentDemo(4)
             }
-            case "Raycast" -> {
-                Raycast.load(TESTBED);
-                TESTBED.setCurrentDemo(5);
+
+            "Raycast" -> {
+                Raycast.load(TESTBED)
+                TESTBED.setCurrentDemo(5)
             }
-            case "Trebuchet" -> {
-                Trebuchet.load(TESTBED);
-                TESTBED.followPayload = true;
-                TESTBED.setCurrentDemo(6);
+
+            "Trebuchet" -> {
+                Trebuchet.load(TESTBED)
+                TESTBED.followPayload = true
+                TESTBED.setCurrentDemo(6)
             }
-            case "Slice objects" -> {
-                SliceObjects.load(TESTBED);
-                Settings.HERTZ = 120;
-                TESTBED.setCurrentDemo(7);
+
+            "Slice objects" -> {
+                SliceObjects.load(TESTBED)
+                Settings.HERTZ = 120.0
+                TESTBED.setCurrentDemo(7)
             }
-            case "Bouncing ball" -> {
-                BouncingBall.load(TESTBED);
-                TESTBED.setCurrentDemo(8);
+
+            "Bouncing ball" -> {
+                BouncingBall.load(TESTBED)
+                TESTBED.setCurrentDemo(8)
             }
-            case "Mixed shapes" -> {
-                MixedShapes.load(TESTBED);
-                TESTBED.setCurrentDemo(9);
+
+            "Mixed shapes" -> {
+                MixedShapes.load(TESTBED)
+                TESTBED.setCurrentDemo(9)
             }
-            case "Newtons cradle" -> {
-                NewtonsCradle.load(TESTBED);
-                TESTBED.setCurrentDemo(10);
+
+            "Newtons cradle" -> {
+                NewtonsCradle.load(TESTBED)
+                TESTBED.setCurrentDemo(10)
             }
-            case "Wrecking ball" -> {
-                WreckingBall.load(TESTBED);
-                TESTBED.setCurrentDemo(11);
+
+            "Wrecking ball" -> {
+                WreckingBall.load(TESTBED)
+                TESTBED.setCurrentDemo(11)
             }
-            case "Friction" -> {
-                Friction.load(TESTBED);
-                TESTBED.setCurrentDemo(12);
+
+            "Friction" -> {
+                Friction.load(TESTBED)
+                TESTBED.setCurrentDemo(12)
             }
-            case "Drag" -> {
-                Drag.load(TESTBED);
-                TESTBED.setCurrentDemo(13);
+
+            "Drag" -> {
+                Drag.load(TESTBED)
+                TESTBED.setCurrentDemo(13)
             }
-            case "Restitution" -> {
-                Restitution.load(TESTBED);
-                TESTBED.setCurrentDemo(14);
+
+            "Restitution" -> {
+                Restitution.load(TESTBED)
+                TESTBED.setCurrentDemo(14)
             }
-            case "Stacked objects" -> {
-                StackedObjects.load(TESTBED);
-                TESTBED.setCurrentDemo(15);
+
+            "Stacked objects" -> {
+                StackedObjects.load(TESTBED)
+                TESTBED.setCurrentDemo(15)
             }
         }
     }
 
-    private void resetUniqueEventHandlers() {
-        TESTBED.setCamera(new Vectors2D(0, 0), 1);
-        TESTBED.followPayload = false;
-        ProximityExplosionTest.active = false;
-        ParticleExplosionTest.active = false;
-        RaycastExplosionTest.active = false;
-        SliceObjects.active = false;
-        LineOfSight.active = false;
-        Trebuchet.active = false;
-        Settings.HERTZ = 60;
+    private fun resetUniqueEventHandlers() {
+        TESTBED.setCamera(Vec2(0.0, 0.0), 1.0)
+        TESTBED.followPayload = false
+        ProximityExplosionTest.active = false
+        ParticleExplosionTest.active = false
+        RaycastExplosionTest.active = false
+        SliceObjects.active = false
+        LineOfSight.active = false
+        Trebuchet.active = false
+        Settings.HERTZ = 60.0
     }
 
-    protected void setProximityEpicentre(MouseEvent e) {
-        Vectors2D v = CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY()));
-        ProximityExplosion p = (ProximityExplosion) TESTBED.getRayExplosions().get(0);
-        p.setEpicentre(v);
+    protected fun setProximityEpicentre(e: MouseEvent) {
+        val v = CAMERA.convertToWorld(Vec2(e.getX().toDouble(), e.getY().toDouble()))
+        val p = TESTBED.rayExplosions.get(0) as ProximityExplosion
+        p.setEpicentre(v)
     }
 
-    protected void generateParticleExplosion(MouseEvent e) {
-        ParticleExplosion p = new ParticleExplosion(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())), 100, 10);
-        p.createParticles(0.5, 100, 5, TESTBED.getWorld());
-        p.applyBlastImpulse(100);
-        TESTBED.add(p, 2);
+    protected fun generateParticleExplosion(e: MouseEvent) {
+        val p = ParticleExplosion(CAMERA.convertToWorld(Vec2(e.getX().toDouble(), e.getY().toDouble())), 100)
+        p.createParticles(0.5, 100, 5, TESTBED.world)
+        p.applyBlastImpulse(100.0)
+        TESTBED.add(p, 2.0)
+    }
+
+    companion object {
+        @JvmStatic
+        protected var currentDemo: String = "Chains"
     }
 }

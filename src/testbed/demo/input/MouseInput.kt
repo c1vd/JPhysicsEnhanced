@@ -1,64 +1,57 @@
-package testbed.demo.input;
+package testbed.demo.input
 
-import library.rays.Slice;
-import library.math.Vectors2D;
-import testbed.demo.TestBedWindow;
-import testbed.demo.tests.ParticleExplosionTest;
-import testbed.demo.tests.ProximityExplosionTest;
-import testbed.demo.tests.RaycastExplosionTest;
-import testbed.demo.tests.SliceObjects;
+import library.math.Vec2
+import library.rays.Slice
+import testbed.demo.TestBedWindow
+import testbed.demo.tests.ParticleExplosionTest
+import testbed.demo.tests.ProximityExplosionTest
+import testbed.demo.tests.RaycastExplosionTest
+import testbed.demo.tests.SliceObjects
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
+import javax.swing.SwingUtilities
 
-import javax.swing.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-public class MouseInput extends TestbedControls implements MouseListener {
-    public MouseInput(TestBedWindow testBedWindow) {
-        super(testBedWindow);
+class MouseInput(testBedWindow: TestBedWindow) : TestbedControls(testBedWindow), MouseListener {
+    override fun mouseClicked(e: MouseEvent?) {
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
+    override fun mousePressed(e: MouseEvent) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            CAMERA.setPointClicked(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())));
+            CAMERA.pointClicked = CAMERA.convertToWorld(Vec2(e.getX().toDouble(), e.getY().toDouble()))
         }
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
+    override fun mouseReleased(e: MouseEvent) {
         if (!SwingUtilities.isRightMouseButton(e)) {
             if (ProximityExplosionTest.active) {
-                setProximityEpicentre(e);
-                ProximityExplosionTest.p.applyBlastImpulse(5000000);
+                setProximityEpicentre(e)
+                ProximityExplosionTest.p!!.applyBlastImpulse(5000000.0)
             } else if (ParticleExplosionTest.active) {
-                generateParticleExplosion(e);
+                generateParticleExplosion(e)
             } else if (RaycastExplosionTest.active) {
-                RaycastExplosionTest.r.applyBlastImpulse(500000);
+                RaycastExplosionTest.r!!.applyBlastImpulse(500000.0)
             } else if (SliceObjects.active) {
-                if (TESTBED.getSlicesSize() == 1) {
-                    TESTBED.getSlices().get(0).setDirection(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())));
-                    TESTBED.getSlices().get(0).sliceObjects(TESTBED.getWorld());
-                    TESTBED.getSlices().clear();
+                if (TESTBED.slicesSize == 1) {
+                    TESTBED.slices.get(0)
+                        .setDirection(CAMERA.convertToWorld(Vec2(e.getX().toDouble(), e.getY().toDouble())))
+                    TESTBED.slices.get(0).sliceObjects(TESTBED.world)
+                    TESTBED.slices.clear()
                 } else {
-                    Slice s = new Slice(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())), new Vectors2D(1, 0), 0);
-                    TESTBED.add(s);
+                    val s = Slice(
+                        CAMERA.convertToWorld(Vec2(e.getX().toDouble(), e.getY().toDouble())),
+                        Vec2(1.0, 0.0),
+                        0.0
+                    )
+                    TESTBED.add(s)
                 }
             }
         }
     }
 
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
+    override fun mouseEntered(e: MouseEvent?) {
     }
 
-    @Override
-    public void mouseExited(MouseEvent e) {
-
+    override fun mouseExited(e: MouseEvent?) {
     }
 }
 

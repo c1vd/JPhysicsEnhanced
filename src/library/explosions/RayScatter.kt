@@ -1,30 +1,31 @@
-package library.explosions;
+package library.explosions
 
-import library.dynamics.Body;
-import library.rays.Ray;
-import library.math.Matrix2D;
-import library.math.Vectors2D;
-import testbed.Camera;
-import testbed.ColourSettings;
-
-import java.awt.*;
-import java.util.ArrayList;
+import library.dynamics.Body
+import library.math.Matrix2D
+import library.math.Vec2
+import library.rays.Ray
+import testbed.Camera
+import testbed.ColourSettings
+import java.awt.Graphics2D
 
 /**
  * Models rayscatter explosions.
  */
-public class RayScatter {
-    private final Ray[] rays;
-    private final int noOfRays;
-    private Vectors2D epicentre;
+class RayScatter(private var epicentre: Vec2, private val noOfRays: Int) {
+    /**
+     * Getter for rays.
+     *
+     * @return Array of all rays part of the ray scatter.
+     */
+    lateinit var rays: Array<Ray>
 
     /**
      * Getter for epicentre variable.
      *
      * @return Returns epicentre of explosion.
      */
-    public Vectors2D getEpicentre() {
-        return epicentre;
+    fun getEpicentre(): Vec2 {
+        return epicentre
     }
 
     /**
@@ -32,23 +33,11 @@ public class RayScatter {
      *
      * @param v The vector position of the new epicentre.
      */
-    public void setEpicentre(Vectors2D v) {
-        this.epicentre = v;
-        for (Ray ray : rays) {
-            ray.setStartPoint(epicentre);
+    fun setEpicentre(v: Vec2) {
+        this.epicentre = v
+        for (ray in rays) {
+            ray.setStartPoint(epicentre)
         }
-    }
-
-    /**
-     * Constructor
-     *
-     * @param epicentre Epicentre of explosion.
-     * @param noOfRays  Number of projected rays.
-     */
-    public RayScatter(Vectors2D epicentre, int noOfRays) {
-        rays = new Ray[noOfRays];
-        this.epicentre = epicentre;
-        this.noOfRays = noOfRays;
     }
 
     /**
@@ -56,14 +45,15 @@ public class RayScatter {
      *
      * @param distance Distance of projected rays.
      */
-    public void castRays(int distance) {
-        double angle = 6.28319 / noOfRays;
-        Vectors2D direction = new Vectors2D(1, 1);
-        Matrix2D u = new Matrix2D(angle);
-        for (int i = 0; i < rays.length; i++) {
-            rays[i] = new Ray(epicentre, direction, distance);
-            u.mul(direction);
-        }
+    fun castRays(distance: Int) {
+        val angle = 6.28319 / noOfRays
+        val direction = Vec2(1.0, 1.0)
+        val u = Matrix2D(angle)
+        rays = (0 until noOfRays).map {
+            Ray(epicentre, direction, distance).also {
+                u.mul(direction)
+            }
+        }.toTypedArray()
     }
 
     /**
@@ -71,9 +61,9 @@ public class RayScatter {
      *
      * @param worldBodies Arraylist of all bodies to update ray projections for.
      */
-    public void updateRays(ArrayList<Body> worldBodies) {
-        for (Ray ray : rays) {
-            ray.updateProjection(worldBodies);
+    fun updateRays(worldBodies: ArrayList<Body>) {
+        for (ray in rays) {
+            ray.updateProjection(worldBodies)
         }
     }
 
@@ -84,18 +74,9 @@ public class RayScatter {
      * @param paintSettings Colour settings to draw the objects to screen with
      * @param camera        Camera class used to convert points from world space to view space
      */
-    public void draw(Graphics2D g, ColourSettings paintSettings, Camera camera) {
-        for (Ray ray : rays) {
-            ray.draw(g, paintSettings, camera);
+    fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
+        for (ray in rays) {
+            ray.draw(g, paintSettings, camera)
         }
-    }
-
-    /**
-     * Getter for rays.
-     *
-     * @return Array of all rays part of the ray scatter.
-     */
-    public Ray[] getRays() {
-        return rays;
     }
 }

@@ -1,19 +1,20 @@
-package library.dynamics;
+package library.dynamics
 
-import java.util.Random;
+import java.util.*
 
 /**
  * Settings class where all the constants are stored for the physics engine.
  */
-public class Settings {
-    public static final double PENETRATION_ALLOWANCE = 0.01;
-    public static final double PENETRATION_CORRECTION = 0.5;
-    public static final double BIAS_RELATIVE = 0.95;
-    public static final double BIAS_ABSOLUTE = 0.01;
+object Settings {
+    const val PENETRATION_ALLOWANCE: Double = 0.01
+    const val PENETRATION_CORRECTION: Double = 0.5
+    const val BIAS_RELATIVE: Double = 0.95
+    const val BIAS_ABSOLUTE: Double = 0.01
 
-    public static double HERTZ = 60.0;
-    public static final int ITERATIONS = 100;
-    public static final double EPSILON = 1E-12;
+    @JvmField
+    var HERTZ: Double = 60.0
+    const val ITERATIONS: Int = 100
+    const val EPSILON: Double = 1E-12
 
     /**
      * Generates a random number within the desired range.
@@ -21,9 +22,9 @@ public class Settings {
      * @param max Maximum double value that the range can fall inside
      * @return double value inside the range of min and max supplied
      */
-    public static double generateRandomNoInRange(double min, double max) {
-        Random rand = new Random();
-        return min + (max - min) * rand.nextDouble();
+    fun generateRandomNoInRange(min: Double, max: Double): Double {
+        val rand = Random()
+        return min + (max - min) * rand.nextDouble()
     }
 
     /**
@@ -32,8 +33,8 @@ public class Settings {
      * @param max Maximum int value that the range can fall inside
      * @return int value inside the range of min and max supplied
      */
-    public static int generateRandomNoInRange(int min, int max) {
-        Random rand = new Random();
-        return rand.nextInt(max - min + 1) + min;
+    fun generateRandomNoInRange(min: Int, max: Int): Int {
+        val rand = Random()
+        return rand.nextInt(max - min + 1) + min
     }
 }

@@ -123,7 +123,7 @@ int&nbsp;distance)</code></th>
 </td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(library.math.Vectors2D,double,int)">Ray</a></span>&#8203;(<a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;startPoint,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(library.math.Vec2,double,int)">Ray</a></span>&#8203;(<a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;startPoint,
 double&nbsp;direction,
 int&nbsp;distance)</code></th>
 <td class="colLast">
@@ -131,14 +131,14 @@ int&nbsp;distance)</code></th>
 </td>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(library.math.Vectors2D,int)">Ray</a></span>&#8203;(<a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;direction,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(library.math.Vec2,int)">Ray</a></span>&#8203;(<a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;direction,
 int&nbsp;distance)</code></th>
 <td class="colLast">
 <div class="block">Convenience constructor with ray set at origin.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(library.math.Vectors2D,library.math.Vectors2D,int)">Ray</a></span>&#8203;(<a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;startPoint,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(library.math.Vec2,library.math.Vec2,int)">Ray</a></span>&#8203;(<a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;startPoint,
 <a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;direction,
 int&nbsp;distance)</code></th>
 <td class="colLast">
@@ -234,7 +234,7 @@ testbed.Camera&nbsp;camera)</code></th>
 <ul class="blockList">
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(library.math.Vectors2D,library.math.Vectors2D,int)">Ray</a></h3>
+<h3><a id="&lt;init&gt;(library.math.Vec2,library.math.Vec2,int)">Ray</a></h3>
 <div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">Ray</span>&#8203;(<span class="arguments"><a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;startPoint,
 <a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;direction,
 int&nbsp;distance)</span></div>
@@ -253,7 +253,7 @@ int&nbsp;distance)</span></div>
 <div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">Ray</span>&#8203;(<span class="arguments">double&nbsp;direction,
 int&nbsp;distance)</span></div>
 <div class="block">Convenience constructor with ray set at origin. Similar to
- <a href="#%3Cinit%3E(library.math.Vectors2D,library.math.Vectors2D,int)"><code>Ray(Vectors2D, Vectors2D, int)</code></a></div>
+ <a href="#%3Cinit%3E(library.math.Vec2,library.math.Vec2,int)"><code>Ray(Vectors2D, Vectors2D, int)</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>direction</code> - The direction of the ray points in radians.</dd>
@@ -263,11 +263,11 @@ int&nbsp;distance)</span></div>
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(library.math.Vectors2D,int)">Ray</a></h3>
+<h3><a id="&lt;init&gt;(library.math.Vec2,int)">Ray</a></h3>
 <div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">Ray</span>&#8203;(<span class="arguments"><a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;direction,
 int&nbsp;distance)</span></div>
 <div class="block">Convenience constructor with ray set at origin. Similar to
- <a href="#%3Cinit%3E(library.math.Vectors2D,library.math.Vectors2D,int)"><code>Ray(Vectors2D, Vectors2D, int)</code></a></div>
+ <a href="#%3Cinit%3E(library.math.Vec2,library.math.Vec2,int)"><code>Ray(Vectors2D, Vectors2D, int)</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>direction</code> - The direction of the ray points.</dd>
@@ -277,12 +277,12 @@ int&nbsp;distance)</span></div>
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(library.math.Vectors2D,double,int)">Ray</a></h3>
+<h3><a id="&lt;init&gt;(library.math.Vec2,double,int)">Ray</a></h3>
 <div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">Ray</span>&#8203;(<span class="arguments"><a href="../math/Vectors2D.html" title="class in library.math">Vectors2D</a>&nbsp;startPoint,
 double&nbsp;direction,
 int&nbsp;distance)</span></div>
 <div class="block">Convenience constructor. Similar to
- <a href="#%3Cinit%3E(library.math.Vectors2D,library.math.Vectors2D,int)"><code>Ray(Vectors2D, Vectors2D, int)</code></a></div>
+ <a href="#%3Cinit%3E(library.math.Vec2,library.math.Vec2,int)"><code>Ray(Vectors2D, Vectors2D, int)</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>startPoint</code> - The origin of the rays projection.</dd>

@@ -1,21 +1,15 @@
-package testbed.demo.input;
+package testbed.demo.input
 
-import testbed.demo.TestBedWindow;
+import testbed.demo.TestBedWindow
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
 
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-
-public class MouseScroll extends TestbedControls implements MouseWheelListener {
-    public MouseScroll(TestBedWindow testBedWindow) {
-        super(testBedWindow);
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
+class MouseScroll(testBedWindow: TestBedWindow) : TestbedControls(testBedWindow), MouseWheelListener {
+    override fun mouseWheelMoved(e: MouseWheelEvent) {
         if (e.getWheelRotation() < 0) {
-            CAMERA.zoom *= 0.9;
+            CAMERA.zoom *= 0.9
         } else {
-            CAMERA.zoom *= 1.1;
+            CAMERA.zoom *= 1.1
         }
     }
 }

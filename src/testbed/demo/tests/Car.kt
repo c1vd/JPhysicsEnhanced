@@ -1,16 +1,15 @@
-package testbed.demo.tests;
+package testbed.demo.tests
 
-import library.dynamics.World;
-import library.math.Vectors2D;
-import testbed.demo.TestBedWindow;
+import library.dynamics.World
+import library.math.Vec2
+import testbed.demo.TestBedWindow
 
-public class Car {
-    public static final String[] text = {"Car:"};
+object Car {
+    val text: Array<String?> = arrayOf<String?>("Car:")
 
-    public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, 0)));
-        World world = testBedWindow.getWorld();
-        testBedWindow.setCamera(new Vectors2D(0, 0), 1.4);
-
+    fun load(testBedWindow: TestBedWindow) {
+        testBedWindow.world = World(Vec2(0.0, 0.0))
+        val world = testBedWindow.world
+        testBedWindow.setCamera(Vec2(0.0, 0.0), 1.4)
     }
 }
