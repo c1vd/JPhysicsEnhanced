@@ -25,13 +25,13 @@ class KeyBoardInput(testBedWindow: TestBedWindow) : TestbedControls(testBedWindo
                 Settings.HERTZ = 60.0
             }
         } else if (e.getKeyCode() == KeyEvent.VK_R) {
-            loadDemo(TestbedControls.Companion.currentDemo)
+            loadDemo(currentDemo)
         }
     }
 
     override fun keyReleased(e: KeyEvent) {
         if (e.getKeyCode() == KeyEvent.VK_M) {
-            val p = TESTBED.pAINT_SETTINGS
+            val p = TESTBED.PAINT_SETTINGS
             p.drawText = !p.drawText
         }
     }

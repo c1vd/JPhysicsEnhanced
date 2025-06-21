@@ -70,7 +70,7 @@ class Ray(private var startPoint: Vec2, direction: Vec2, private val distance: I
      */
     fun updateProjection(bodiesToEvaluate: ArrayList<Body>) {
         this.rayInformation = null
-        val endPoint = direction.scalar(distance.toDouble())
+        val endPoint = direction * distance.toDouble()
         val end_x = endPoint.x
         val end_y = endPoint.y
 
@@ -80,14 +80,14 @@ class Ray(private var startPoint: Vec2, direction: Vec2, private val distance: I
         var intersectionFound = false
         var closestBody: Body? = null
 
-        for (B in bodiesToEvaluate) {
-            if (B.shape is Polygon) {
-                val poly = B.shape as Polygon
+        for (body in bodiesToEvaluate) {
+            if (body.shape is Polygon) {
+                val poly = body.shape as Polygon
                 for (i in poly.vertices.indices) {
                     var startOfPolyEdge = poly.vertices[i]
                     var endOfPolyEdge = poly.vertices[if (i + 1 == poly.vertices.size) 0 else i + 1]
-                    startOfPolyEdge = poly.orient.mul(startOfPolyEdge, Vec2()) + B.position
-                    endOfPolyEdge = poly.orient.mul(endOfPolyEdge, Vec2()) + B.position
+                    startOfPolyEdge = poly.orient.mul(startOfPolyEdge, Vec2()) + body.position
+                    endOfPolyEdge = poly.orient.mul(endOfPolyEdge, Vec2()) + body.position
                     val dx = endOfPolyEdge.x - startOfPolyEdge.x
                     val dy = endOfPolyEdge.y - startOfPolyEdge.y
 
@@ -99,21 +99,21 @@ class Ray(private var startPoint: Vec2, direction: Vec2, private val distance: I
 
                         if (t1 > 0 && t2 >= 0 && t2 <= 1.0) {
                             val point = Vec2(startPoint.x + end_x * t1, startPoint.y + end_y * t1)
-                            val dist = (point - startPoint).length()
+                            val dist = (point - startPoint).length
                             if (t1 < min_t1 && dist < distance) {
                                 min_t1 = t1
                                 min_px = point.x
                                 min_py = point.y
                                 intersectionFound = true
-                                closestBody = B
+                                closestBody = body
                             }
                         }
                     }
                 }
-            } else if (B.shape is Circle) {
-                val circle = B.shape as Circle
+            } else if (body.shape is Circle) {
+                val circle = body.shape as Circle
                 val ray = endPoint.copy()
-                val circleCenter = B.position.copy()
+                val circleCenter = body.position.copy()
                 val r = circle.radius
                 val difInCenters = startPoint - circleCenter
 
@@ -132,7 +132,7 @@ class Ray(private var startPoint: Vec2, direction: Vec2, private val distance: I
                             min_px = startPoint.x + end_x * t1
                             min_py = startPoint.y + end_y * t1
                             intersectionFound = true
-                            closestBody = B
+                            closestBody = body
                         }
                     }
                 }
@@ -153,12 +153,12 @@ class Ray(private var startPoint: Vec2, direction: Vec2, private val distance: I
     fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         g.color = paintSettings.projectedRay
         val epicenter = camera.convertToScreen(startPoint)
-        val endPoint = camera.convertToScreen(direction.scalar(distance.toDouble()) + startPoint)
+        val endPoint = camera.convertToScreen(direction * distance.toDouble() + startPoint)
         g.draw(Line2D.Double(epicenter.x, epicenter.y, endPoint.x, endPoint.y))
 
         g.color = paintSettings.rayToBody
         if (this.rayInformation != null) {
-            val intersection = camera.convertToScreen(rayInformation!!.coord!!)
+            val intersection = camera.convertToScreen(rayInformation!!.coord)
             g.draw(Line2D.Double(epicenter.x, epicenter.y, intersection.x, intersection.y))
 
             val circleRadius = camera.scaleToScreenXValue(paintSettings.RAY_DOT)

@@ -38,7 +38,7 @@ object DemoText {
     fun drawArray(lines: Array<String?>, g: Graphics2D) {
         var y = 20
         for (line in lines) {
-            g.drawString(line, 5, y)
+            g.drawString(line!!, 5, y)
             y += 20
         }
         g.drawString("Right click: moves the camera position", 5, y)

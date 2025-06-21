@@ -87,7 +87,7 @@ class Vec2Test {
     fun normalize() {
         val vec1 = Vec2(-345.34, 745.0)
         vec1.normalize()
-        TestCase.assertEquals(vec1.length(), 1.0, 0.0)
+        TestCase.assertEquals(vec1.length, 1.0, 0.0)
         TestCase.assertEquals(vec1.x, -0.4205573495355269, 0.0)
         TestCase.assertEquals(vec1.y, 0.9072659564602061, 0.0)
     }
@@ -122,17 +122,17 @@ class Vec2Test {
     }
 
     @Test
-    fun vectorCrossProduct() {
+    fun vectorCross() {
         val vec1 = Vec2(2.0, 3.0)
         val vec2 = Vec2(5.0, 6.0)
-        val i = vec1.crossProduct(vec2)
+        val i = vec1.cross(vec2)
         TestCase.assertEquals(-3.0, i, 0.0)
     }
 
     @Test
-    fun scalarCrossProduct() {
+    fun scalarCross() {
         val vec1 = Vec2(2.0, 3.0)
-        val cross = vec1.crossProduct(4.0)
+        val cross = vec1.cross(4.0)
         TestCase.assertEquals(2.0, vec1.x, 0.0)
         TestCase.assertEquals(3.0, vec1.y, 0.0)
 
@@ -143,7 +143,7 @@ class Vec2Test {
     @Test
     fun scalar() {
         val vec1 = Vec2(5.0, 2.0)
-        val vec2 = vec1.scalar(4.0)
+        val vec2 = vec1 * 4.0
         TestCase.assertEquals(5.0, vec1.x, 0.0)
         TestCase.assertEquals(2.0, vec1.y, 0.0)
         TestCase.assertEquals(20.0, vec2.x, 0.0)
@@ -161,7 +161,7 @@ class Vec2Test {
     @Test
     fun length() {
         val vec1 = Vec2(0.0, 7.0)
-        val `val` = vec1.length()
+        val `val` = vec1.length
         TestCase.assertEquals(7.0, `val`, 0.0)
     }
 

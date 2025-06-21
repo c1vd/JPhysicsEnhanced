@@ -32,7 +32,7 @@ class World {
     }
 
     @JvmField
-    var bodies: ArrayList<Body> = ArrayList<Body>()
+    var bodies: ArrayList<Body> = ArrayList()
 
     /**
      * Adds a body to the world
@@ -40,8 +40,8 @@ class World {
      * @param b Body to add.
      * @return Returns the newly added body.
      */
-    fun addBody(b: Body?): Body? {
-        bodies.add(b!!)
+    fun addBody(b: Body): Body {
+        bodies.add(b)
         return b
     }
 
@@ -55,7 +55,7 @@ class World {
     }
 
     @JvmField
-    var joints: ArrayList<Joint> = ArrayList<Joint>()
+    var joints: ArrayList<Joint> = ArrayList()
 
     /**
      * Adds a joint to the world.
@@ -63,9 +63,8 @@ class World {
      * @param j The joint to add.
      * @return Returns the joint added to the world.
      */
-    fun addJoint(j: Joint?): Joint? {
-        joints.add(j!!)
-        return j
+    fun addJoint(j: Joint) {
+        joints.add(j)
     }
 
     /**
@@ -114,7 +113,7 @@ class World {
                 continue
             }
 
-            b.position.add(b.velocity.scalar(dt))
+            b.position.add(b.velocity * dt)
             b.orientation = b.orientation + (dt * b.angularVelocity)
 
             b.force.set(0.0, 0.0)
@@ -136,10 +135,10 @@ class World {
             applyLinearDrag(b)
 
             if (b.affectedByGravity) {
-                b.velocity.add(gravity.scalar(dt))
+                b.velocity.add(gravity * dt)
             }
 
-            b.velocity.add(b.force.scalar(b.invMass).scalar(dt))
+            b.velocity.add(b.force * b.invMass * dt)
             b.angularVelocity += dt * b.invI * b.torque
         }
     }
@@ -175,9 +174,9 @@ class World {
      * @param b Body to apply drag to.
      */
     private fun applyLinearDrag(b: Body) {
-        val velocityMagnitude = b.velocity.length()
+        val velocityMagnitude = b.velocity.length
         val dragForceMagnitude = velocityMagnitude * velocityMagnitude * b.linearDampening
-        val dragForceVector = b.velocity.normalized.scalar(-dragForceMagnitude)
+        val dragForceVector = -b.velocity.normalized * dragForceMagnitude
         b.applyForceToCentre(dragForceVector)
     }
 
@@ -259,12 +258,12 @@ class World {
             val point = contact.contacts[0]
 
             g.color = paintSettings.contactPoint
-            var line: Vec2 = contact.contactNormal.normal().scalar(paintSettings.TANGENT_LINE_SCALAR)
+            var line: Vec2 = contact.contactNormal.normal() * paintSettings.TANGENT_LINE_SCALAR
             var beginningOfLine: Vec2 = camera.convertToScreen(point + line)
             var endOfLine = camera.convertToScreen(point - line)
             g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
 
-            line = contact.contactNormal.scalar(paintSettings.NORMAL_LINE_SCALAR)
+            line = contact.contactNormal * paintSettings.NORMAL_LINE_SCALAR
             beginningOfLine = camera.convertToScreen(point + line)
             endOfLine = camera.convertToScreen(point - line)
             g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))

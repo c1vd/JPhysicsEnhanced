@@ -8,16 +8,11 @@ import java.awt.Graphics2D
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 
+
 /**
  * Models proximity explosions.
  */
-class ProximityExplosion
-/**
- * Constructor.
- *
- * @param epicentre The epicentre of the explosion.
- * @param proximity    The proximity in which bodies are effected.
- */(private var epicentre: Vec2, private val proximity: Int) : Explosion {
+class ProximityExplosion(private var epicentre: Vec2, private val proximity: Int) : Explosion {
     /**
      * Sets the epicentre to a different coordinate.
      *
@@ -27,7 +22,7 @@ class ProximityExplosion
         epicentre = v
     }
 
-    var bodiesEffected: ArrayList<Body> = ArrayList<Body>()
+    var bodiesEffected: ArrayList<Body> = ArrayList()
 
     /**
      * Updates the arraylist to reevaluate what bodies are effected/within the proximity.
@@ -38,7 +33,7 @@ class ProximityExplosion
         bodiesEffected.clear()
         for (b in bodiesToEvaluate) {
             val blastDist = b.position - epicentre
-            if (blastDist.length() <= proximity) {
+            if (blastDist.length <= proximity) {
                 bodiesEffected.add(b)
             }
         }
@@ -78,7 +73,7 @@ class ProximityExplosion
 
         updateLinesToBody()
         for (p in linesToBodies) {
-            g.setColor(paintSettings.linesToObjects)
+            g.color = paintSettings.linesToObjects
             val worldCoord = camera.convertToScreen(p)
             g.draw(Line2D.Double(circlePotion.x, circlePotion.y, worldCoord.x, worldCoord.y))
 
@@ -102,13 +97,13 @@ class ProximityExplosion
     override fun applyBlastImpulse(blastPower: Double) {
         for (b in bodiesEffected) {
             val blastDir = b.position - epicentre
-            val distance = blastDir.length()
+            val distance = blastDir.length
             if (distance == 0.0) return
 
             //Not physically correct as it should be blast * radius to object ^ 2 as the pressure of an explosion in 2D dissipates
             val invDistance = 1 / distance
             val impulseMag = blastPower * invDistance
-            b.applyLinearImpulseToCentre(blastDir.normalized.scalar(impulseMag))
+            b.applyLinearImpulseToCentre(blastDir.normalized * impulseMag)
         }
     }
 }

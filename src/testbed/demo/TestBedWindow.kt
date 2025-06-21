@@ -36,7 +36,7 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
         camera.zoom = zoom
     }
 
-    private val PHYSICS_THREAD: Thread
+    private val PHYSICS_THREAD: Thread = Thread(this)
 
     //Input handler classes
     private val KEY_INPUT: KeyBoardInput
@@ -88,8 +88,8 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
 
     private val trailsToBodies = ArrayList<Trail>()
 
-    fun add(trail: Trail?) {
-        trailsToBodies.add(trail!!)
+    fun add(trail: Trail) {
+        trailsToBodies.add(trail)
     }
 
     private var running = true
@@ -150,7 +150,7 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
                         synchronized(pauseLock) {
                             (pauseLock as Object).wait()
                         }
-                    } catch (e: InterruptedException) {
+                    } catch (_: InterruptedException) {
                         return
                     }
                     if (!running) {
@@ -171,7 +171,7 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
     }
 
     private fun checkParticleLifetime(timePassed: Double) {
-        val bodiesToRemove = ArrayList<Body?>()
+        val bodiesToRemove = ArrayList<Body>()
         val i = trailsToBodies.iterator()
         while (i.hasNext()) {
             val s = i.next()
@@ -190,13 +190,13 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
         }
     }
 
-    private fun removeParticlesFromWorld(s: Array<Body?>) {
+    private fun removeParticlesFromWorld(s: Array<Body>) {
         for (b in s) {
             world.removeBody(b)
         }
     }
 
-    private fun containsBody(s: Array<Body?>, bodiesToRemove: ArrayList<Body?>): Boolean {
+    private fun containsBody(s: Array<Body>, bodiesToRemove: ArrayList<Body>): Boolean {
         for (a in s) {
             if (bodiesToRemove.contains(a)) {
                 return true
@@ -217,7 +217,7 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
     }
 
 
-    val pAINT_SETTINGS: ColourSettings = ColourSettings()
+    val PAINT_SETTINGS: ColourSettings = ColourSettings()
 
     private var currentDemo = 0
 
@@ -228,9 +228,8 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
     var followPayload: Boolean = false
 
     init {
-        PHYSICS_THREAD = Thread(this)
 
-        val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
+        val screenSize = Toolkit.getDefaultToolkit().screenSize
         this.camera = Camera(screenSize.getWidth().toInt(), screenSize.getHeight().toInt(), this)
 
         MOUSE_INPUT = MouseInput(this)
@@ -254,47 +253,47 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
         if (ANTIALIASING) {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         }
-        setBackground(pAINT_SETTINGS.background)
+        setBackground(PAINT_SETTINGS.background)
         update()
         if (followPayload) {
-            setCamera(Vec2(world.bodies.get(3).position!!.x, this.camera.centre.y), 2.0)
+            setCamera(Vec2(world.bodies[3].position.x, this.camera.centre.y), 2.0)
         }
-        if (pAINT_SETTINGS.drawGrid) {
+        if (PAINT_SETTINGS.drawGrid) {
             drawGridMethod(g2d)
         }
         for (s in shadowCastings) {
-            s.draw(g2d, this.pAINT_SETTINGS, this.camera)
+            s.draw(g2d, this.PAINT_SETTINGS, this.camera)
         }
         drawTrails(g2d)
         for (b in world.bodies) {
-            if (pAINT_SETTINGS.drawShapes) {
-                b.shape.draw(g2d, this.pAINT_SETTINGS, this.camera)
+            if (PAINT_SETTINGS.drawShapes) {
+                b.shape.draw(g2d, this.PAINT_SETTINGS, this.camera)
             }
-            if (pAINT_SETTINGS.drawAABBs) {
-                b.shape.drawAABB(g2d, this.pAINT_SETTINGS, this.camera)
+            if (PAINT_SETTINGS.drawAABBs) {
+                b.shape.drawAABB(g2d, this.PAINT_SETTINGS, this.camera)
             }
-            if (pAINT_SETTINGS.drawCOMs) {
-                b.shape.drawCOMS(g2d, this.pAINT_SETTINGS, this.camera)
+            if (PAINT_SETTINGS.drawCOMs) {
+                b.shape.drawCOMS(g2d, this.PAINT_SETTINGS, this.camera)
             }
         }
-        if (pAINT_SETTINGS.drawContacts) {
-            world.drawContact(g2d, this.pAINT_SETTINGS, this.camera)
+        if (PAINT_SETTINGS.drawContacts) {
+            world.drawContact(g2d, this.PAINT_SETTINGS, this.camera)
         }
-        if (pAINT_SETTINGS.drawJoints) {
+        if (PAINT_SETTINGS.drawJoints) {
             for (j in world.joints) {
-                j.draw(g2d, this.pAINT_SETTINGS, this.camera)
+                j.draw(g2d, this.PAINT_SETTINGS, this.camera)
             }
         }
         for (p in this.rayExplosions) {
-            p.draw(g2d, this.pAINT_SETTINGS, this.camera)
+            p.draw(g2d, this.PAINT_SETTINGS, this.camera)
         }
         for (r in rays) {
-            r.draw(g2d, this.pAINT_SETTINGS, this.camera)
+            r.draw(g2d, this.PAINT_SETTINGS, this.camera)
         }
         for (s in slices) {
-            s.draw(g2d, this.pAINT_SETTINGS, this.camera)
+            s.draw(g2d, this.PAINT_SETTINGS, this.camera)
         }
-        draw(g2d, this.pAINT_SETTINGS, currentDemo)
+        draw(g2d, this.PAINT_SETTINGS, currentDemo)
     }
 
     private fun drawGridMethod(g2d: Graphics2D) {
@@ -303,12 +302,12 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
         val minXY = -projection
         val maxXY = projection
         val totalProjectionDistance = projection + projection
-        g2d.setColor(pAINT_SETTINGS.gridLines)
+        g2d.color = PAINT_SETTINGS.gridLines
         var i = 0
         while (i <= totalProjectionDistance) {
             if (i == projection) {
-                g2d.setStroke(pAINT_SETTINGS.axisStrokeWidth)
-                g2d.setColor(pAINT_SETTINGS.gridAxis)
+                g2d.stroke = PAINT_SETTINGS.axisStrokeWidth
+                g2d.color = PAINT_SETTINGS.gridAxis
             }
 
             val currentMinY = camera.convertToScreen(Vec2((minXY + i).toDouble(), minXY.toDouble()))
@@ -320,28 +319,24 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
             g2d.draw(Line2D.Double(currentMinX.x, currentMinX.y, currentMaxX.x, currentMaxX.y))
 
             if (i == projection) {
-                g2d.setStroke(pAINT_SETTINGS.defaultStrokeWidth)
-                g2d.setColor(pAINT_SETTINGS.gridLines)
+                g2d.stroke = PAINT_SETTINGS.defaultStrokeWidth
+                g2d.color = PAINT_SETTINGS.gridLines
             }
             i += spacing
         }
     }
 
     private fun drawTrails(g: Graphics2D) {
-        g.setColor(pAINT_SETTINGS.trail)
+        g.color = PAINT_SETTINGS.trail
         for (t in trailsToBodies) {
             val s = Path2D.Double()
             for (i in t.trailPoints.indices) {
                 var v = t.trailPoints[i]
-                if (v == null) {
-                    break
+                v = camera.convertToScreen(v)
+                if (i == 0) {
+                    s.moveTo(v.x, v.y)
                 } else {
-                    v = camera.convertToScreen(v)
-                    if (i == 0) {
-                        s.moveTo(v.x, v.y)
-                    } else {
-                        s.lineTo(v.x, v.y)
-                    }
+                    s.lineTo(v.x, v.y)
                 }
             }
             g.draw(s)
@@ -514,7 +509,7 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
 
         val heightOfPillar = height + height
         val widthOfPillar = width + width
-        for (k in 0..<floors) {
+        repeat(floors) {
             val leftPillar = Body(Polygon(width, height), x.toDouble(), y + height)
             addPillar(leftPillar)
 
@@ -555,24 +550,30 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
         fun showWindow(gameScreen: TestBedWindow?, title: String?, windowWidth: Int, windowHeight: Int) {
             if (gameScreen != null) {
                 val window = JFrame(title)
-                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-                window.add(gameScreen)
-                window.setMinimumSize(Dimension(800, 600))
-                window.setPreferredSize(Dimension(windowWidth, windowHeight))
-                window.pack()
-                window.setLocationRelativeTo(null)
+                window.apply {
+                    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+                    add(gameScreen)
+                    minimumSize = Dimension(800, 600)
+                    setPreferredSize(Dimension(windowWidth, windowHeight))
+                    pack()
+                    setLocationRelativeTo(null)
+                }
+
                 gameScreen.setFocusable(true)
                 gameScreen.setOpaque(true)
-                gameScreen.setBackground(gameScreen.pAINT_SETTINGS.background)
+                gameScreen.setBackground(gameScreen.PAINT_SETTINGS.background)
 
                 val menuBar = JMenuBar()
-                menuBar.add(createTestMenu(gameScreen))
-                menuBar.add(createColourSchemeMenu(gameScreen))
-                menuBar.add(createFrequencyMenu(gameScreen))
-                menuBar.add(createDisplayMenu(gameScreen))
-                window.setJMenuBar(menuBar)
+                menuBar.apply {
+                    add(createTestMenu(gameScreen))
+                    add(createColourSchemeMenu(gameScreen))
+                    add(createFrequencyMenu(gameScreen))
+                    add(createDisplayMenu(gameScreen))
+                }
 
-                window.setVisible(true)
+                window.jMenuBar = menuBar
+
+                window.isVisible = true
             }
         }
 
@@ -612,14 +613,14 @@ class TestBedWindow(private val ANTIALIASING: Boolean) : JPanel(), Runnable {
             for (i in 1..4) {
                 val hertzMenuItem = JMenuItem("" + number * i)
                 hertzMenu.add(hertzMenuItem)
-                hertzMenuItem.addActionListener(ActionListener { e: ActionEvent? ->
-                    when (e!!.getActionCommand()) {
+                hertzMenuItem.addActionListener { e: ActionEvent ->
+                    when (e.getActionCommand()) {
                         "30" -> Settings.HERTZ = 30.0
                         "60" -> Settings.HERTZ = 60.0
                         "90" -> Settings.HERTZ = 90.0
                         "120" -> Settings.HERTZ = 120.0
                     }
-                })
+                }
             }
             return hertzMenu
         }

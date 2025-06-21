@@ -18,13 +18,7 @@ import kotlin.math.atan2
 /**
  * A class for generating polygons that can mimic line of sight around objects and cast shadows.
  */
-class ShadowCasting
-/**
- * Constructor
- *
- * @param startPoint Origin of projecting rays.
- * @param distance   The desired distance to project the rays.
- */(private var startPoint: Vec2, private val distance: Int) {
+class ShadowCasting(private var startPoint: Vec2, private val distance: Int) {
     /**
      * Setter for start point.
      *
@@ -57,7 +51,7 @@ class ShadowCasting
             } else {
                 val circle = B.shape as Circle
                 val d = B.position - startPoint
-                val angle = asin(circle.radius / d.length())
+                val angle = asin(circle.radius / d.length)
                 val u = Matrix2D(angle)
                 projectRays(u.mul(d.normalized, Vec2()), bodiesToEvaluate)
                 val u2 = Matrix2D(-angle)

@@ -33,7 +33,7 @@ class JointToBody
     offset1: Vec2,
     private val offset2: Vec2
 ) : Joint(b1, jointLength, jointConstant, dampening, canGoSlack, offset1) {
-    private var object2AttachmentPoint: Vec2? = null
+    private lateinit var object2AttachmentPoint: Vec2
 
     /**
      * Applies tension to the two bodies.
@@ -46,11 +46,11 @@ class JointToBody
         this.object2AttachmentPoint = object2.position + mat2.mul(offset2, Vec2())
 
         val tension = calculateTension()
-        val distance = (this.object2AttachmentPoint!! - this.object1AttachmentPoint!!).normalized
+        val distance = (this.object2AttachmentPoint - this.object1AttachmentPoint).normalized
 
-        val impulse = distance.scalar(tension)
-        object1.applyLinearImpulse(impulse, object1AttachmentPoint!! - object1.position)
-        object2.applyLinearImpulse(-impulse, object2AttachmentPoint!! - object2.position)
+        val impulse = distance * tension
+        object1.applyLinearImpulse(impulse, object1AttachmentPoint - object1.position)
+        object2.applyLinearImpulse(-impulse, object2AttachmentPoint - object2.position)
     }
 
     /**
@@ -59,7 +59,7 @@ class JointToBody
      * @return double value of the tension force between the two bodies attachment points
      */
     override fun calculateTension(): Double {
-        val distance = (object1AttachmentPoint!! - object2AttachmentPoint!!).length()
+        val distance = (object1AttachmentPoint - object2AttachmentPoint).length
         if (distance < naturalLength && canGoSlack) {
             return 0.0
         }
@@ -75,11 +75,11 @@ class JointToBody
      * @return double value of the rate of change
      */
     override fun rateOfChangeOfExtension(): Double {
-        val distance = (object2AttachmentPoint!! - object1AttachmentPoint!!).normalized
+        val distance = (object2AttachmentPoint - object1AttachmentPoint).normalized
 
         val relativeVelocity = object2.velocity - object1.velocity +
-                (object2AttachmentPoint!! - object2.position).crossProduct(object2.angularVelocity) -
-                (object1AttachmentPoint!! - object1.position).crossProduct(object1.angularVelocity)
+                (object2AttachmentPoint - object2.position).cross(object2.angularVelocity) -
+                (object1AttachmentPoint - object1.position).cross(object1.angularVelocity)
 
         return relativeVelocity.dotProduct(distance)
     }
@@ -93,8 +93,8 @@ class JointToBody
      */
     override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         g.color = paintSettings.joints
-        val obj1Pos = camera.convertToScreen(object1AttachmentPoint!!)
-        val obj2Pos = camera.convertToScreen(object2AttachmentPoint!!)
+        val obj1Pos = camera.convertToScreen(object1AttachmentPoint)
+        val obj2Pos = camera.convertToScreen(object2AttachmentPoint)
         g.draw(Line2D.Double(obj1Pos.x, obj1Pos.y, obj2Pos.x, obj2Pos.y))
     }
 }

@@ -19,7 +19,7 @@ class Polygon : Shape {
      *
      * @param vertList Vertices of polygon to create.
      */
-    constructor(vertList: Array<Vec2?>) {
+    constructor(vertList: Array<Vec2>) {
         this.vertices = generateHull(vertList, vertList.size)
         calcNormals()
     }
@@ -86,19 +86,19 @@ class Polygon : Shape {
         for (i in vertices.indices) {
             val point1 = vertices[i]
             val point2 = vertices[(i + 1) % vertices.size]
-            val areaOfParallelogram = point1.crossProduct(point2)
+            val areaOfParallelogram = point1.cross(point2)
             val triangleArea = 0.5 * areaOfParallelogram
             area += triangleArea
 
             val weight = triangleArea * k
-            centroidDistVec.add(point1.scalar(weight))
-            centroidDistVec.add(point2.scalar(weight))
+            centroidDistVec.add(point1 * weight)
+            centroidDistVec.add(point2 * weight)
 
             val intx2 = point1.x * point1.x + point2.x * point1.x + point2.x * point2.x
             val inty2 = point1.y * point1.y + point2.y * point1.y + point2.y * point2.y
             I += (0.25 * k * areaOfParallelogram) * (intx2 + inty2)
         }
-        centroidDistVec = centroidDistVec.scalar(1.0 / area)
+        centroidDistVec = centroidDistVec * (1.0 / area)
 
         for (i in vertices.indices) {
             vertices[i] = vertices[i] - centroidDistVec
@@ -181,13 +181,13 @@ class Polygon : Shape {
      * @param n        Number of vertices supplied.
      * @return Convex hull array.
      */
-    private fun generateHull(vertices: Array<Vec2?>, n: Int): Array<Vec2> {
+    private fun generateHull(vertices: Array<Vec2>, n: Int): Array<Vec2> {
         val hull = ArrayList<Vec2>()
 
         var firstPointIndex = 0
         var minX = Double.Companion.MAX_VALUE
         for (i in 0..<n) {
-            val x = vertices[i]!!.x
+            val x = vertices[i].x
             if (x < minX) {
                 firstPointIndex = i
                 minX = x
@@ -199,11 +199,11 @@ class Polygon : Shape {
         var first = true
         while (point != firstPointIndex || first) {
             first = false
-            hull.add(vertices[point]!!)
+            hull.add(vertices[point])
             currentEvalPoint = (point + 1) % n
             for (i in 0..<n) {
-                if (sideOfLine(vertices[point]!!, vertices[i]!!, vertices[currentEvalPoint]!!) == -1) currentEvalPoint =
-                    i
+                if (sideOfLine(vertices[point], vertices[i], vertices[currentEvalPoint]) == -1)
+                    currentEvalPoint = i
             }
             point = currentEvalPoint
         }

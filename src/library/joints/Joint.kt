@@ -23,7 +23,7 @@ abstract class Joint protected constructor(
     protected val dampeningConstant: Double
     protected val canGoSlack: Boolean
     protected val offset1: Vec2
-    protected var object1AttachmentPoint: Vec2?
+    protected var object1AttachmentPoint: Vec2
 
     /**
      * Default constructor

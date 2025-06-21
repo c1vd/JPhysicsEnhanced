@@ -11,20 +11,7 @@ import kotlin.math.min
 /**
  * Creates manifolds to detect collisions and apply forces to them. Discrete in nature and only evaluates pairs of bodies in a single manifold.
  */
-class Arbiter(
-    /**
-     * Getter for Body A.
-     *
-     * @return Body A
-     */
-    val a: Body,
-    /**
-     * Getter for Body B.
-     *
-     * @return Body B
-     */
-    val b: Body
-) {
+class Arbiter(val a: Body, val b: Body) {
     /**
      * Static fiction constant to be set during the construction of the arbiter.
      */
@@ -73,7 +60,7 @@ class Arbiter(
 
         val normal = b.position - a.position
 
-        val distance = normal.length()
+        val distance = normal.length
         val radius = ca.radius + cb.radius
 
         if (distance >= radius) {
@@ -90,7 +77,7 @@ class Arbiter(
         } else {
             this.penetration = radius - distance
             this.contactNormal = normal.normalized
-            this.contacts[0].set(this.contactNormal.scalar(ca.radius) + a.position)
+            this.contacts[0].set(this.contactNormal * ca.radius + a.position)
         }
     }
 
@@ -179,7 +166,7 @@ class Arbiter(
             this.penetration = A.radius - distFromEdgeToCircle
             this.contactCount = 1
             B.orient.mul(B.normals[faceNormalIndex], this.contactNormal)
-            val circleContactPoint = a.position + this.contactNormal.negative().scalar(A.radius)
+            val circleContactPoint = a.position + this.contactNormal.negative() * A.radius
             this.contacts[0].set(circleContactPoint)
         }
     }
@@ -298,7 +285,7 @@ class Arbiter(
             contactPoint = contactVectorsFound[0]
             this.penetration = totalPen
         } else {
-            contactPoint = (contactVectorsFound[1] + contactVectorsFound[0]).scalar(0.5)
+            contactPoint = (contactVectorsFound[1] + contactVectorsFound[0]) * 0.5
             this.penetration = totalPen / 2
         }
         this.contactCount = 1
@@ -329,7 +316,7 @@ class Arbiter(
         if (dist * dist1 < 0.0) {
             val interp = dist / (dist - dist1)
 
-            out[num].set((incidentFace[1] - incidentFace[0]).scalar(interp) + incidentFace[0])
+            out[num].set((incidentFace[1] - incidentFace[0]) * interp + incidentFace[0])
             num++
         }
 
@@ -404,8 +391,8 @@ class Arbiter(
 
         val totalMass = a.mass + b.mass
         val correction = (penetrationTolerance * Settings.PENETRATION_CORRECTION) / totalMass
-        a.position += contactNormal.scalar(-a.mass * correction)
-        b.position += contactNormal.scalar(b.mass * correction)
+        a.position += -contactNormal * a.mass * correction
+        b.position += contactNormal * b.mass * correction
     }
 
     /**
@@ -416,8 +403,8 @@ class Arbiter(
         val contactB = contacts[0] - b.position
 
         //Relative velocity created from equation found in GDC talk of box2D lite.
-        var relativeVel = b.velocity + contactB.crossProduct(b.angularVelocity) - a.velocity -
-                contactA.crossProduct(
+        var relativeVel = b.velocity + contactB.cross(b.angularVelocity) - a.velocity -
+                contactA.cross(
                     a.angularVelocity
                 )
 
@@ -431,32 +418,31 @@ class Arbiter(
             return
         }
 
-        val acn = contactA.crossProduct(contactNormal)
-        val bcn = contactB.crossProduct(contactNormal)
+        val acn = contactA.cross(contactNormal)
+        val bcn = contactB.cross(contactNormal)
         val inverseMassSum = a.invMass + b.invMass + (acn * acn) * a.invI + (bcn * bcn) * b.invI
 
         var j = -(restitution + 1) * contactVel
         j /= inverseMassSum
 
-        val impulse = contactNormal.scalar(j)
+        val impulse = contactNormal * j
         b.applyLinearImpulse(impulse, contactB)
         a.applyLinearImpulse(-impulse, contactA)
 
-        relativeVel = b.velocity + contactB.crossProduct(b.angularVelocity) - a.velocity - contactA.crossProduct(
+        relativeVel = b.velocity + contactB.cross(b.angularVelocity) - a.velocity - contactA.cross(
             a.angularVelocity
         )
 
 
-        val t = (relativeVel.copy() + contactNormal.scalar(-relativeVel.dotProduct(contactNormal))).normalized
+        val t = (relativeVel.copy() - contactNormal * relativeVel.dotProduct(contactNormal)).normalized
 
         var jt = -relativeVel.dotProduct(t)
         jt /= inverseMassSum
 
-        val tangentImpulse: Vec2
-        if (StrictMath.abs(jt) < j * staticFriction) {
-            tangentImpulse = t.scalar(jt)
+        val tangentImpulse: Vec2 = if (StrictMath.abs(jt) < j * staticFriction) {
+            t * jt
         } else {
-            tangentImpulse = t.scalar(j).scalar(-dynamicFriction)
+            -t * j * dynamicFriction
         }
 
         b.applyLinearImpulse(tangentImpulse, contactB)
@@ -490,7 +476,7 @@ class Arbiter(
                 val circle = b.shape as Circle
                 val d = b.position - startPoint
 
-                return !(d.length() > circle.radius)
+                return !(d.length > circle.radius)
             }
 
             return true

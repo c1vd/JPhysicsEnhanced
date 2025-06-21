@@ -15,20 +15,9 @@ import kotlin.math.sqrt
  * Class to allow two polygons to be sliced.
  */
 class Slice(private val startPoint: Vec2, direction: Vec2, private var distance: Double) {
-    private var direction: Vec2
+    private var direction: Vec2 = direction.normalized
 
     private val intersectingBodiesInfo = ArrayList<RayInformation>()
-
-    /**
-     * Constructor to create a slice to later be evaluated.
-     *
-     * @param startPoint The origin of the rays projection.
-     * @param direction  The direction of the ray points in radians.
-     * @param distance   The distance the ray is projected
-     */
-    init {
-        this.direction = direction.normalized
-    }
 
     /**
      * Updates the projection in world space and acquires information about the closest intersecting object with the ray projection.
@@ -37,7 +26,7 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
      */
     fun updateProjection(bodiesToEvaluate: ArrayList<Body>) {
         intersectingBodiesInfo.clear()
-        val endPoint = direction.scalar(distance)
+        val endPoint = direction * distance
         val end_x = endPoint.x
         val end_y = endPoint.y
 
@@ -45,14 +34,14 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
         var min_py: Double
         var noOfIntersections = 0
 
-        for (B in bodiesToEvaluate) {
-            if (B.shape is Polygon) {
-                val poly = B.shape as Polygon
+        for (body in bodiesToEvaluate) {
+            if (body.shape is Polygon) {
+                val poly = body.shape as Polygon
                 for (i in poly.vertices.indices) {
                     var startOfPolyEdge = poly.vertices[i]
                     var endOfPolyEdge = poly.vertices[if (i + 1 == poly.vertices.size) 0 else i + 1]
-                    startOfPolyEdge = poly.orient.mul(startOfPolyEdge, Vec2()) + B.position
-                    endOfPolyEdge = poly.orient.mul(endOfPolyEdge, Vec2()) + B.position
+                    startOfPolyEdge = poly.orient.mul(startOfPolyEdge, Vec2()) + body.position
+                    endOfPolyEdge = poly.orient.mul(endOfPolyEdge, Vec2()) + body.position
                     val dx = endOfPolyEdge.x - startOfPolyEdge.x
                     val dy = endOfPolyEdge.y - startOfPolyEdge.y
 
@@ -64,20 +53,20 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
 
                         if (t1 > 0 && t2 >= 0 && t2 <= 1.0) {
                             val point = Vec2(startPoint.x + end_x * t1, startPoint.y + end_y * t1)
-                            val dist = (point - startPoint).length()
+                            val dist = (point - startPoint).length
                             if (dist < distance) {
                                 min_px = point.x
                                 min_py = point.y
-                                intersectingBodiesInfo.add(RayInformation(B, min_px, min_py, i))
+                                intersectingBodiesInfo.add(RayInformation(body, min_px, min_py, i))
                                 noOfIntersections++
                             }
                         }
                     }
                 }
-            } else if (B.shape is Circle) {
-                val circle = B.shape as Circle
+            } else if (body.shape is Circle) {
+                val circle = body.shape as Circle
                 val ray = endPoint.copy()
-                val circleCenter = B.position.copy()
+                val circleCenter = body.position.copy()
                 val r = circle.radius
                 val difInCenters = startPoint - circleCenter
 
@@ -93,14 +82,14 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
                     if (t1 >= 0 && t1 <= 1) {
                         min_px = startPoint.x + end_x * t1
                         min_py = startPoint.y + end_y * t1
-                        intersectingBodiesInfo.add(RayInformation(B, min_px, min_py, -1))
+                        intersectingBodiesInfo.add(RayInformation(body, min_px, min_py, -1))
                     }
 
                     val t2 = (-b + discriminant) / (2 * a)
                     if (t2 >= 0 && t2 <= 1) {
                         min_px = startPoint.x + end_x * t2
                         min_py = startPoint.y + end_y * t2
-                        intersectingBodiesInfo.add(RayInformation(B, min_px, min_py, -1))
+                        intersectingBodiesInfo.add(RayInformation(body, min_px, min_py, -1))
                     }
                 }
             }
@@ -133,7 +122,7 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
                 val obj2firstIndex = obj1firstIndex
 
                 var totalVerticesObj1 = (obj1firstIndex + 2) + (p.vertices.size - secondIndex)
-                val obj1Vertz = arrayOfNulls<Vec2>(totalVerticesObj1)
+                val obj1Vertz = Array(totalVerticesObj1) { Vec2() }
 
                 for (x in 0..<obj1firstIndex + 1) {
                     obj1Vertz[x] = b.shape.orient.mul(p.vertices[x], Vec2()) + b.position
@@ -147,12 +136,12 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
                 }
 
                 var polyCentre = findPolyCentre(obj1Vertz)
-                val b1 = Body(Polygon(obj1Vertz), polyCentre.x, polyCentre.y)
+                val b1 = Body(Polygon(obj1Vertz), polyCentre)
                 if (isStatic) b1.setDensity(0.0)
                 world.addBody(b1)
 
                 totalVerticesObj1 = secondIndex - obj2firstIndex + 2
-                val obj2Vertz = arrayOfNulls<Vec2>(totalVerticesObj1)
+                val obj2Vertz = Array(totalVerticesObj1) { Vec2() }
 
                 var indexToAddTo = 0
                 obj2Vertz[indexToAddTo++] = intersection1.coord
@@ -164,7 +153,7 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
                 obj2Vertz[totalVerticesObj1 - 1] = intersection2.coord
 
                 polyCentre = findPolyCentre(obj2Vertz)
-                val b2 = Body(Polygon(obj2Vertz), polyCentre.x, polyCentre.y)
+                val b2 = Body(Polygon(obj2Vertz), polyCentre)
                 if (isStatic) b2.setDensity(0.0)
                 world.addBody(b2)
             }
@@ -180,7 +169,7 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
      * @param obj2Vertz Vertices of polygon to find center of mass of.
      * @return Center of mass of type Vectors2D.
      */
-    private fun findPolyCentre(obj2Vertz: Array<Vec2?>): Vec2 {
+    private fun findPolyCentre(obj2Vertz: Array<Vec2>): Vec2 {
         var accumulatedArea = 0.0
         var centerX = 0.0
         var centerY = 0.0
@@ -188,10 +177,10 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
         var i = 0
         var j = obj2Vertz.size - 1
         while (i < obj2Vertz.size) {
-            val temp = obj2Vertz[i]!!.x * obj2Vertz[j]!!.y - obj2Vertz[j]!!.x * obj2Vertz[i]!!.y
+            val temp = obj2Vertz[i].x * obj2Vertz[j].y - obj2Vertz[j].x * obj2Vertz[i].y
             accumulatedArea += temp
-            centerX += (obj2Vertz[i]!!.x + obj2Vertz[j]!!.x) * temp
-            centerY += (obj2Vertz[i]!!.y + obj2Vertz[j]!!.y) * temp
+            centerX += (obj2Vertz[i].x + obj2Vertz[j].x) * temp
+            centerY += (obj2Vertz[i].y + obj2Vertz[j].y) * temp
             j = i++
         }
 
@@ -211,7 +200,7 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
     fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         g.color = paintSettings.projectedRay
         val epicenter = camera.convertToScreen(startPoint)
-        val endPoint = camera.convertToScreen(direction.scalar(distance) + startPoint)
+        val endPoint = camera.convertToScreen(direction * distance + startPoint)
         g.draw(Line2D.Double(epicenter.x, epicenter.y, endPoint.x, endPoint.y))
 
         g.color = paintSettings.rayToBody
@@ -231,7 +220,7 @@ class Slice(private val startPoint: Vec2, direction: Vec2, private var distance:
      */
     fun setDirection(sliceVector: Vec2) {
         direction = sliceVector - startPoint
-        distance = direction.length()
+        distance = direction.length
         direction.normalize()
     }
 }

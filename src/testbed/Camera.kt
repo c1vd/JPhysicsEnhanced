@@ -56,7 +56,7 @@ class Camera(windowWidth: Int, windowHeight: Int, testWindow: TestBedWindow) {
 
     private fun updateViewSize(aspectRatio: Double) {
         var extents = Vec2(aspectRatio * 200, 200.0)
-        extents = extents.scalar(zoom)
+        extents = extents * zoom
         upperBound = centre + extents
         lowerBound = centre - extents
     }
@@ -64,7 +64,7 @@ class Camera(windowWidth: Int, windowHeight: Int, testWindow: TestBedWindow) {
     fun scaleToScreenXValue(radius: Double): Double {
         val aspectRatio = width * 1.0 / height
         var extents = Vec2(aspectRatio * 200, 200.0)
-        extents = extents.scalar(zoom)
+        extents = extents * zoom
         val upperBound = centre + extents
         val lowerBound = centre - extents
         val w = radius / (upperBound.x - lowerBound.x)

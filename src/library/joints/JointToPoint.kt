@@ -58,13 +58,13 @@ class JointToPoint
      */
     override fun applyTension() {
         val mat1 = Matrix2D(object1.orientation)
-        this.object1AttachmentPoint = object1.position + mat1.mul(offset1, Vec2())
+        object1AttachmentPoint = object1.position + mat1.mul(offset1, Vec2())
 
         val tension = calculateTension()
-        val distance = (pointAttachedTo - object1AttachmentPoint!!).normalized
+        val distance = (pointAttachedTo - object1AttachmentPoint).normalized
 
-        val impulse = distance.scalar(tension)
-        object1.applyLinearImpulse(impulse, object1AttachmentPoint!! - object1.position)
+        val impulse = distance * tension
+        object1.applyLinearImpulse(impulse, object1AttachmentPoint - object1.position)
     }
 
     /**
@@ -73,7 +73,7 @@ class JointToPoint
      * @return double value of the tension force between the point and attached bodies point
      */
     override fun calculateTension(): Double {
-        val distance = (object1AttachmentPoint!! - pointAttachedTo).length()
+        val distance = (object1AttachmentPoint - pointAttachedTo).length
         if (distance < naturalLength && canGoSlack) {
             return 0.0
         }
@@ -89,10 +89,10 @@ class JointToPoint
      * @return double value of the rate of change
      */
     override fun rateOfChangeOfExtension(): Double {
-        val distance = (pointAttachedTo - object1AttachmentPoint!!).normalized
+        val distance = (pointAttachedTo - object1AttachmentPoint).normalized
 
         val relativeVelocity =
-            -object1.velocity - object1AttachmentPoint!! - (object1.position).crossProduct(object1.angularVelocity)
+            -object1.velocity - object1AttachmentPoint - object1.position.cross(object1.angularVelocity)
 
         return relativeVelocity.dotProduct(distance)
     }
@@ -106,7 +106,7 @@ class JointToPoint
      */
     override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         g.color = paintSettings.joints
-        val obj1Pos = camera.convertToScreen(object1AttachmentPoint!!)
+        val obj1Pos = camera.convertToScreen(object1AttachmentPoint)
         val obj2Pos = camera.convertToScreen(pointAttachedTo)
         g.draw(Line2D.Double(obj1Pos.x, obj1Pos.y, obj2Pos.x, obj2Pos.y))
     }

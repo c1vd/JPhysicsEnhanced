@@ -11,7 +11,6 @@ object Settings {
     const val BIAS_RELATIVE: Double = 0.95
     const val BIAS_ABSOLUTE: Double = 0.01
 
-    @JvmField
     var HERTZ: Double = 60.0
     const val ITERATIONS: Int = 100
     const val EPSILON: Double = 1E-12

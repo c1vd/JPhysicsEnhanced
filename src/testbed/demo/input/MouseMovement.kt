@@ -36,7 +36,7 @@ class MouseMovement(testBedWindow: TestBedWindow) : TestbedControls(testBedWindo
         if (!SwingUtilities.isRightMouseButton(e)) {
             val v = CAMERA.convertToWorld(Vec2(e.getX().toDouble(), e.getY().toDouble()))
             if (ProximityExplosionTest.active) {
-                val p = TESTBED.rayExplosions.get(0) as ProximityExplosion
+                val p = TESTBED.rayExplosions[0] as ProximityExplosion
                 p.setEpicentre(v)
             } else if (RaycastExplosionTest.active) {
                 RaycastExplosionTest.r!!.setEpicentre(v)

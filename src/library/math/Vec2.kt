@@ -101,7 +101,7 @@ class Vec2 {
         return this
     }
 
-    operator fun unaryMinus(): Vec2{
+    operator fun unaryMinus(): Vec2 {
         return Vec2(-x, -y)
     }
 
@@ -112,8 +112,8 @@ class Vec2 {
      * @return Returns the current instance vector.
      */
     fun add(v: Vec2): Vec2 {
-        this.x = x + v.x
-        this.y = y + v.y
+        x += v.x
+        y += v.y
         return this
     }
 
@@ -183,15 +183,15 @@ class Vec2 {
      * @param v Other vector to apply cross product to
      * @return double
      */
-    fun crossProduct(v: Vec2): Double {
+    fun cross(v: Vec2): Double {
         return this.x * v.y - this.y * v.x
     }
 
-    fun crossProduct(a: Double): Vec2 {
-        return this.normal().scalar(a)
+    fun cross(a: Double): Vec2 {
+        return this.normal() * a
     }
 
-    fun scalar(a: Double): Vec2 {
+    operator fun times(a: Double): Vec2 {
         return Vec2(x * a, y * a)
     }
 
@@ -205,14 +205,8 @@ class Vec2 {
         return this.x * v.x + this.y * v.y
     }
 
-    /**
-     * Gets the length of instance vector.
-     *
-     * @return double
-     */
-    fun length(): Double {
-        return sqrt(x * x + y * y)
-    }
+    val length: Double
+        get() = sqrt(x * x + y * y)
 
     val isValid: Boolean
         /**

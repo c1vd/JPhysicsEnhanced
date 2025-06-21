@@ -16,11 +16,11 @@ class Trail(noOfTrailPoints: Int, private val skipInterval: Int, @JvmField val b
     fun updateTrail() {
         if (counter >= skipInterval) {
             if (trailEndPointIndex <= arrayEndPos) {
-                trailPoints[trailEndPointIndex] = body.position!!.copy()
+                trailPoints[trailEndPointIndex] = body.position.copy()
                 trailEndPointIndex++
             } else {
                 System.arraycopy(trailPoints, 1, trailPoints, 0, arrayEndPos)
-                trailPoints[arrayEndPos] = body.position!!.copy()
+                trailPoints[arrayEndPos] = body.position.copy()
             }
             counter = 0
         } else {

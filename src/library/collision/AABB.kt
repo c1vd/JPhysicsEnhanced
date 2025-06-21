@@ -121,8 +121,6 @@ class AABB {
          * @param B Second body to evaluate.
          * @return Boolean value of whether the two bodies AABB's overlap in world space.
          */
-
-        @JvmStatic
         fun AABBOverLap(A: Body, B: Body): Boolean {
             val aCopy = A.aabb.copy()
             val bCopy = B.aabb.copy()
@@ -140,7 +138,6 @@ class AABB {
          * @param b Second AABB to evaluate.
          * @return Boolean value of whether two bounds of the AABB's overlap.
          */
-        @JvmStatic
         fun AABBOverLap(a: AABB, b: AABB): Boolean {
             return a.min.x <= b.max.x && a.max.x >= b.min.x && a.min.y <= b.max.y && a.max.y >= b.min.y
         }
